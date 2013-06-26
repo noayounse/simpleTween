@@ -1,255 +1,356 @@
 package simpleTween;
 
-import java.util.ArrayList;
-
 public class STween {
-	private int duration = 1;
-	private int progress = 0; // where it is along the duration
-	float lastFrame = -1f;
-	float percent = 0f; // progress / duration
-	int delay = 0;
-	float startValue = 0f;
-	float endValue = 1f;
-	private float value = 1f;
-	float conception = 0f;
+	private float duration = 0;
+	private float delay = 0;
+	private float lastFrame = 0;
 
-	final int LINEAR = 0;
-	final int QUAD_BOTH = 1;
-	final int CUBIC_BOTH = 2;
-	final int QUARTIC_BOTH = 3;
-	final int QUINT_IN = 20;
-	int mode = QUAD_BOTH; // default
+	public int timeMode = SimpleTween.baseTimeMode;
 
-	boolean isPlaying = false;
+	private boolean isPlaying = false;
+	private boolean hasStarted = false;
+	private boolean paused = false;
 
-	// redirect
-	STween redirectTween = null;
-	public boolean inRedirect = false;
-	private float redirectNewTarget = 0f;
-	private float redirectOldTarget = 0f;
-	private int redirectNewDuration = 0;
-	private int redirectOldDuration = 0;
-	private int lastRedirectDuration = 0;
+	private float currentValue = 0f;
+	private float startValue, endValue;
+	private float originalStartValue, originalEndValue;
+	private float originalDuration, originalDelay;
 
-	// targets
-	public ArrayList<NextTarget> nextTargets = new ArrayList<NextTarget>();
+	private float[][] runTimes = new float[0][0]; // [conception time][start
+													// time][end
+													// time][startValue][endValue]
+	private float[] lastStep = new float[0]; // records last step for this
+												// runtime
+	private float[] lastTime = new float[0]; // records the last time
 
-	public STween(int duration_, int delay_) {
+	public int mode = SimpleTween.baseEasingMode; // default
+
+	public STween(float duration_, float delay_, float startValue_,
+			float endValue_) {
+		currentValue = startValue_;
+		startValue = startValue_;
+		endValue = endValue_;
 		duration = duration_;
-		redirectOldDuration = duration; // like a backup
 		delay = delay_;
-		value = startValue;
-	} // end Constructor
+		lastFrame = SimpleTween.parent.frameCount;
+		originalStartValue = startValue_;
+		originalEndValue = endValue_;
+		originalDuration = duration_;
+		originalDelay = delay_;
+	} // end constructor
 
 	public void setModeLinear() {
-		mode = LINEAR;
+		mode = SimpleTween.LINEAR;
 	} // end setModeLinear
 
 	public void setModeCubicBoth() {
-		mode = CUBIC_BOTH;
+		mode = SimpleTween.CUBIC_BOTH;
 	} // end setModeCubic
 
+	public void setModeCubicIn() {
+		mode = SimpleTween.CUBIC_IN;
+	} // end setModeCubicIn
+
+	public void setModeCubicOut() {
+		mode = SimpleTween.CUBIC_OUT;
+	} // end setModeCubicOut
+
 	public void setModeQuadBoth() {
-		mode = QUAD_BOTH;
+		mode = SimpleTween.QUAD_BOTH;
 	} // end setModeQuadBot
 
 	public void setModeQuarticBoth() {
-		mode = QUARTIC_BOTH;
+		mode = SimpleTween.QUARTIC_BOTH;
 	} // end setModeQuarticBoth
 
 	public void setModeQuintIn() {
-		mode = QUINT_IN;
+		mode = SimpleTween.QUINT_IN;
 	} // end setModeQuintIn
 
-	public void play() {
-		if (!isPlaying && progress > 0)
-			conception -= delay;
-		else if (!isPlaying)
-			conception = SimpleTween.parent.frameCount;
-		if (progress == duration || isPlaying)
-			progress = 0;
-		if (redirectTween != null)
-			redirectTween.play();
-		isPlaying = true;
-	} // end play
+	public void setMode(int modeIn) {
+		mode = modeIn;
+	} // end setMode
 
-	public void pause() {
-		isPlaying = false;
-		if (redirectTween != null)
-			redirectTween.pause();
-	} // end
+	public void setTimeToFrames() {
+		setTimeMode(SimpleTween.FRAMES_MODE);
+	} // end setTimeToFrames
 
-	public boolean isPlaying() {
-		return isPlaying;
-	} // end isPlaying
+	public void setTimeToSeconds() {
+		setTimeMode(SimpleTween.SECONDS_MODE);
+	} // end setTimeToSeconds
 
-	public void setBegin(float valueIn) {
-		resetProgress();
-		startValue = valueIn;
+	public void setTimeMode(int modeIn) {
+		timeMode = modeIn;
+	} // end setTimeMode
+
+	public int getTimeMode() {
+		return timeMode;
+	} // end getTimeMode
+
+	public void setBegin(float startIn) {
+		startValue = startIn;
 	} // end setBegin
 
-	public void setEnd(float valueIn) {
-		setBegin(value);
-		endValue = valueIn;
-	} // end setEnd
+	public void setEnd(float endIn) {
+		endValue = endIn;
+	} // end endIn
 
-	public void addNextTarget(Object valueIn) {
-		addNextTarget(valueIn, redirectOldDuration, delay);
-	} // end addNextTarget
-
-	public void addNextTarget(Object valueIn, int durationIn, int delayIn) {
-		NextTarget newTarget = new NextTarget(valueIn, durationIn, delayIn);
-		nextTargets.add(newTarget);
-	} // end addNextTarget
-
-	public void resetProgress() {
-		progress = 0;
-	} // end resetProgress
-
-	public void setDelay(int delayIn) {
-		if (!isPlaying()) {
-			delay = delayIn;
-		}
-	} // end setDelay
-
-	public void setDuration(int durationIn) {
+	public void setDuration(float durationIn) {
 		duration = durationIn;
 	} // end setDuration
 
-	public int getDuration() {
-		return duration;
-	} // end getDuration
+	public void setDelay(float delayIn) {
+		delay = delayIn;
+	} // end setDelay
 
-	public int getProgress() {
-		return progress;
-	} // end getProgress
+	public float getBegin() {
+		return startValue;
+	} // end getBegin
+
+	public float getEnd() {
+		return endValue;
+	} // end getEnd
+
+	public float getCurrent() {
+		return currentValue;
+	} // end getCurrent
+
+	public void play() {
+		if (isPlaying && paused) {
+			paused = false;
+		} else {
+			isPlaying = true;
+			hasStarted = true;
+			lastFrame = SimpleTween.parent.frameCount - 1;
+			currentValue = startValue;
+			resetSteps();
+			calculateSteps();
+		}
+	} // end play
+
+	public void pause() {
+		if (isPlaying)
+			paused = true;
+	} // end pause
+
+	public void reset() {
+		isPlaying = false;
+		paused = false;
+		setBegin(originalStartValue);
+		setEnd(originalEndValue);
+		setDuration(originalDuration);
+		setDelay(originalDelay);
+		currentValue = startValue;
+		resetSteps();
+		resetHasStarted();
+	} // end reset
+
+	public boolean isPaused() {
+		return paused;
+	} // end isPaused
+
+	public void playLive(float endValueIn) {
+		playLive(endValueIn, duration, 0);
+	}
+
+	public void playLive(float endValueIn, float durationIn, float delayIn) {
+		if (endValueIn != endValue) {
+			if (isPlaying) {
+				startValue = endValue;
+			} else {
+				resetSteps();
+				startValue = currentValue;
+			}
+			endValue = endValueIn;
+			duration = durationIn;
+			delay = delayIn;
+			calculateSteps();
+			isPlaying = true;
+			paused = false;
+			hasStarted = true;
+		}
+	} // end playLive
+
+	public void resetSteps() {
+		runTimes = new float[0][0];
+		lastStep = new float[0];
+	}
+
+	public void calculateSteps() {
+		float[] newRunTimes = new float[5];
+		if (timeMode == SimpleTween.FRAMES_MODE) {
+			newRunTimes[0] = SimpleTween.parent.frameCount;
+			newRunTimes[1] = delay + newRunTimes[0];
+			newRunTimes[2] = newRunTimes[1] + duration;
+		} else {
+			newRunTimes[0] = SimpleTween.parent.millis();
+			newRunTimes[1] = 1000 * (delay) + newRunTimes[0];
+			newRunTimes[2] = newRunTimes[1] + 1000 * (duration);
+		}
+		newRunTimes[3] = startValue;
+		newRunTimes[4] = endValue;
+		runTimes = SimpleTween.append(runTimes, newRunTimes);
+		lastStep = SimpleTween.append(lastStep, 0f);
+		lastTime = SimpleTween.append(lastStep, 0f);
+	} // end calculateSteps
+
+	public float value() {
+		if (hasSteps()) {
+			// deal with pauses...
+			if (paused) {
+				for (int i = 0; i < runTimes.length; i++) {
+					if (SimpleTween.parent.frameCount != lastFrame) {
+						if (timeMode == SimpleTween.FRAMES_MODE) {
+							runTimes[i][1]++;
+							runTimes[i][2]++;
+						} else {
+							float millisDiff = SimpleTween.parent.millis() - lastTime[i];
+							runTimes[i][1] += millisDiff;
+							runTimes[i][2] += millisDiff;
+							lastTime[i] = SimpleTween.parent.millis();
+						}
+					}
+				}
+			} else {
+				for (int i = 0; i < runTimes.length; i++) {
+					if (SimpleTween.parent.frameCount != lastFrame) {
+						if (timeMode == SimpleTween.FRAMES_MODE) {
+							if (SimpleTween.parent.frameCount <= runTimes[i][2]
+									&& SimpleTween.parent.frameCount >= runTimes[i][1]) {
+								float newStepSize = getStep(runTimes[i]);
+								float adjustedStep = newStepSize - lastStep[i];
+								currentValue += adjustedStep;
+								lastStep[i] = newStepSize;
+							}
+						} else {
+							if (SimpleTween.parent.millis() <= runTimes[i][2]
+									&& SimpleTween.parent.millis() >= runTimes[i][1]) {
+								float newStepSize = getStep(runTimes[i]);
+								float adjustedStep = newStepSize - lastStep[i];
+								currentValue += adjustedStep;
+								lastStep[i] = newStepSize;
+							}
+						}
+					}
+				}
+			}
+			if (SimpleTween.parent.frameCount != lastFrame)
+				lastFrame = SimpleTween.parent.frameCount;
+		} else {
+			isPlaying = false;
+		}
+
+		// adjust the final value when the tween is done
+		if (isDone()) {
+			currentValue = endValue;
+		}
+		else if(!hasStarted && !isPlaying) {
+			currentValue = startValue;	
+		}
+
+		return currentValue;
+	} // end value
+
+	public boolean hasSteps() {
+		if (timeMode == SimpleTween.FRAMES_MODE) {
+			for (float[] f : runTimes)
+				if (SimpleTween.parent.frameCount <= f[2])
+					return true;
+		} else {
+			for (float[] f : runTimes)
+				if (SimpleTween.parent.millis() <= f[2])
+					return true;
+		}
+		return false;
+	} // end hasSteps
+
+	public boolean isPlaying() {
+		if (hasSteps() && isPlaying)
+			return true;
+		return false;
+	} // end isPlaying
 
 	public boolean isDone() {
-		if ((progress >= duration && redirectTween == null))
+		if (!hasSteps() && runTimes.length > 0)
 			return true;
 		return false;
 	} // end isDone
 
-	public float valueST() {
-		updateRedirect();
-		if (isPlaying && progress >= duration && redirectTween == null) {
-			// println(frameCount + " toggling isPlaying to false");
-			isPlaying = false;
-		}
-		if (isPlaying && SimpleTween.parent.frameCount > conception + delay) {
-			if (SimpleTween.parent.frameCount != lastFrame) {
-				progress++;
-				lastFrame = SimpleTween.parent.frameCount;
-			}
-			findValue();
-		} else if (progress >= duration && redirectTween == null) {
-			value = endValue;
-		} else if (progress == 0) {
-			value = startValue;
-		}
-		updatePercent();
-		return value;
-	}// end value
+	public boolean hasStarted() {
+		return hasStarted;
+	} // end hasStarted
 
-	private void updatePercent() {
-		percent = (float) progress / duration;
-	} // end updateMultiplierAndPercent
+	public void resetHasStarted() {
+		hasStarted = false;
+	} // end resetHasStarted
 
-	private void findValue() {
+	public float getDuration() {
+		return duration;
+	} // end getDuration
+
+	public float getDelay() {
+		return delay;
+	} // end getDelay
+
+	public float getStep(float[] runTimeIn) {
+		float thisStep = 0f;
 		// see http://www.gizma.com/easing/
-		// t = current time -- frameCount - conception
+		// t = current time -- SimpleTween.parent.frameCount - conception
 		// b = start value -- startValue
 		// c = change in value -- (endValue - startValue)
 		// d = duration -- duration
-		float t = progress;
-		float c = (endValue - startValue);
-		float d = duration;
-		float b = startValue;
+		float t = SimpleTween.parent.frameCount - runTimeIn[1];
+		if (timeMode == SimpleTween.SECONDS_MODE)
+			t = SimpleTween.parent.millis() - runTimeIn[1];
+		float c = runTimeIn[4] - runTimeIn[3];
+		float d = runTimeIn[2] - runTimeIn[1];
+		// float b = runTimeIn[3];
+		float b = 0f;
 		switch (mode) {
-		case LINEAR:
-			value = c * t / d + b;
+		case SimpleTween.LINEAR:
+			thisStep = c * t / d + b;
 			break;
-		case QUAD_BOTH:
+		case SimpleTween.QUAD_BOTH:
 			t /= d / 2;
 			if (t < 1)
-				value = c / 2 * t * t + b;
+				thisStep = c / 2 * t * t + b;
 			else {
 				t--;
-				value = -c / 2 * (t * (t - 2) - 1) + b;
+				thisStep = -c / 2 * (t * (t - 2) - 1) + b;
 			}
 			break;
-		case CUBIC_BOTH:
+		case SimpleTween.CUBIC_BOTH:
 			t /= d / 2;
 			if (t < 1)
-				value = c / 2 * t * t * t + b;
+				thisStep = c / 2 * t * t * t + b;
 			else {
 				t -= 2;
-				value = c / 2 * (t * t * t + 2) + b;
+				thisStep = c / 2 * (t * t * t + 2) + b;
 			}
 			break;
-		case QUARTIC_BOTH:
-			t /= d / 2;
-			if (t < 1)
-				value = c / 2 * t * t * t * t + b;
-			else {
-				t -= 2;
-				value = -c / 2 * (t * t * t * t - 2) + b;
-			}
-			break;
-		case QUINT_IN:
+		case SimpleTween.CUBIC_IN:
 			t /= d;
-			value = c * t * t * t * t * t + b;
+			thisStep = c * t * t * t + b;
+			break;
+		case SimpleTween.CUBIC_OUT:
+			t /= d;
+			t--;
+			thisStep = c * (t * t * t + 1) + b;
+			break;
+		case SimpleTween.QUARTIC_BOTH:
+			t /= d / 2;
+			if (t < 1)
+				thisStep = c / 2 * t * t * t * t + b;
+			else {
+				t -= 2;
+				thisStep = -c / 2 * (t * t * t * t - 2) + b;
+			}
+			break;
+		case SimpleTween.QUINT_IN:
+			t /= d;
+			thisStep = c * t * t * t * t * t + b;
 			break;
 		} // end switch
-	} // end findValue
-
-	public void redirect() {
-		//if (isPlaying && redirectTween == null) { // for now only one redirect
-													// is allowed because more
-													// than one looks crappy
-		if (isPlaying) { 
-			// redirectTween = new STween(duration - progress - 1, 0, 0, 1);
-			redirectNewTarget = 1f;
-			//redirectOldTarget = endValue;
-			//redirectOldTarget = redirectTween.value();
-			redirectOldTarget = 0f;
-			
-			redirectTween = new STween(duration, 0);
-			//redirectTween.mode = mode;
-			redirectTween.mode = LINEAR;
-			redirectTween.play();
-			/*
-			redirectNewDuration = (int) (Math.floor((duration - (conception
-					+ duration - redirectTween.conception))));
-					*/
-			
-			lastRedirectDuration = duration;
-			if (!inRedirect) redirectOldDuration = duration;
-			inRedirect = true;
-		}
-	} // end redirect
-
-	private void updateRedirect() {
-		if (inRedirect) {
-			if (redirectTween.isDone() && progress >= duration) {
-				//endValue = redirectNewTarget;
-				endValue = redirectNewTarget;
-				duration = redirectOldDuration;
-				inRedirect = false;
-				redirectTween = null;
-			} else {
-				endValue = (redirectTween.valueST() * redirectNewTarget + (1 - redirectTween
-						.valueST()) * redirectOldTarget);
-				duration = lastRedirectDuration + (int) (Math.floor(redirectTween.valueST()	* redirectOldDuration));
-			}
-		}
-	} // end updateRedirect
-
-	@Override
-	public String toString() {
-		return SimpleTween.parent.frameCount + " duration: " + duration
-				+ " start: " + startValue + " end: " + endValue
-				+ " isPlaying: " + isPlaying + " value: " + value
-				+ " conception: " + conception + " delay: " + delay;
-	} // end toString
-} // end class SimpleTween
+		return thisStep;
+	} // end getStep
+} // end class FST

@@ -1,25 +1,28 @@
 package simpleTween;
 
 public class NextTarget {
-	private Object nextTarget;
-	private int duration = 1;
-	private int delay = 0;
+	private float[] nextTarget;
+	private float duration = 1;
+	private float delay = 0;
+	public int timeMode = 0;
 
-	public NextTarget(Object nextTarget_, int duration_, int delay_) {
+	public NextTarget(float duration_, float delay_, float[] nextTarget_,
+			int timeMode_) {
 		nextTarget = nextTarget_;
 		duration = duration_;
 		delay = delay_;
+		timeMode = timeMode_;
 	} // end constructor
 
-	public Object getTarget() {
+	public float[] getTarget() {
 		return nextTarget;
 	} // end getTarget
 
-	public int getDuration() {
+	public float getDuration() {
 		return duration;
 	}// end getDuration
 
-	public int getDelay() {
+	public float getDelay() {
 		return delay;
 	} // end getDelay
 } // end NextTarget
