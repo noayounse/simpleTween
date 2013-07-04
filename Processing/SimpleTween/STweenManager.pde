@@ -66,7 +66,7 @@ class STweenManager {
     for (int i = 0; i < degree; i++) allTweens.get(i).setMode(modeIn);
   } // end setMode  
 
-    void setTimeToFrames() {
+  void setTimeToFrames() {
     setTimeMode(FRAMES_MODE);
   } // end setTimeToFrames
   void setTimeToSeconds() {
@@ -163,8 +163,12 @@ class STweenManager {
       for (int i = 0; i < degree; i++) {
         allTweens.get(i).playLive(valuesIn[i], durationIn, delayIn);
       }
-      // start any onEnds
+      
+      /// ********** //
+      for (int i = 0; i < degree; i++) allTweens.get(i).adjustDurations();
+      
     }
+    // start any onEnds
     startOnEnds();
   } // end playLive
 

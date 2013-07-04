@@ -114,7 +114,7 @@ public class STweenManager {
 		for (int i = 0; i < allTweens.size(); i++)
 			allTweens.get(i).pause();
 	} // end pause
-
+	
 	public boolean isPaused() {
 		return allTweens.get(0).isPaused();
 	} // end isPaused
@@ -125,6 +125,12 @@ public class STweenManager {
 		nextTargets = new ArrayList<NextTarget>();
 	}
 
+	public void quitOnEnds() {
+		for (int i = 0; i < onEnds.size(); i++) {
+			onEnds.get(i).quit();
+		}
+	 } // end quitOnEnds
+	
 	public void setCurrent(float[] valuesIn) {
 		reset();
 		setBegin(valuesIn);
@@ -196,8 +202,9 @@ public class STweenManager {
 			for (int i = 0; i < degree; i++) {
 				allTweens.get(i).playLive(valuesIn[i], durationIn, delayIn);
 			}
-			// start any onEnds
+			for (int i = 0; i < degree; i++) allTweens.get(i).adjustDurations();
 		}
+		// start any onEnds
 		startOnEnds();
 	} // end playLive
 

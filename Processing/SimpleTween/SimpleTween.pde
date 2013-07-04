@@ -113,7 +113,8 @@ void drawCross(PVector loc) {
 
 void mouseReleased() {  
   fst.playLive(mouseX);
-  pvst.playLive(new PVector(mouseX, mouseY), 3, .25);
+  if (!pvst.isPlaying()) pvst.playLive(new PVector(mouseX, mouseY), 6, 0);
+  else pvst.playLive(new PVector(mouseX, mouseY), 2, 0);
   //pvst.playLive(new PVector(mouseX, mouseY), 99.8, 0);
   println("clicked: " + frameCount + "... " + nf((float)millis() / 1000, 0, 2));
   tempPrintDone = true;

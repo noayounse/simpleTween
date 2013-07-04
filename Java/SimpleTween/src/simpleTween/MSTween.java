@@ -26,6 +26,16 @@ public class MSTween {
 		return st.getTimeMode();
 	} // end getTimeMode
 
+	public boolean isPlaying() {
+		if (st.isPlaying())
+			return true;
+		return false;
+	} // end isPlaying
+	
+	public void pause() {
+		st.quitOnEnds();
+	} // end pause
+
 	public void play() {
 		if (!st.isPlaying())
 			st.onEnd(targetObj, methodName);
