@@ -33,8 +33,8 @@ class PVSTween extends STweenManager {
   void playLive(PVector valueIn, float durationIn, float delayIn) {
     super.playLive(breakUp(valueIn), durationIn, delayIn);
   } // end playLive
-
-
+  
+  
   // ******* //
   public void jitter(PVector valueIn) {
     STween lastTween = super.allTweens.get(0);
@@ -43,7 +43,7 @@ class PVSTween extends STweenManager {
   public void jitter(PVector valueIn, float durationIn, float delayIn) {
     super.jitter(breakUp(valueIn), durationIn, delayIn);
   } // end jitter
-
+  
 
 
   PVector value() {

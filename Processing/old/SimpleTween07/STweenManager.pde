@@ -188,15 +188,14 @@ class STweenManager {
         allTweens.get(i).playLive(valuesIn[i], durationIn, delayIn);
       }
 
-
-    // *********** // 
-      //if (adjustForFasterPlayLive) for (int i = 0; i < degree; i++) allTweens.get(i).adjustDurations();
+      if (adjustForFasterPlayLive) for (int i = 0; i < degree; i++) allTweens.get(i).adjustDurations();
     }
     // start any onEnds
     startOnEnds();
   } // end playLive
 
 
+  // *********** //
   private void jitter(float[] valuesIn, float durationIn, float delayIn) {
     for (int i = 0; i < degree; i++) {
       jitterTweens.get(i).playLive(valuesIn[i], durationIn/2, delayIn);

@@ -44,25 +44,20 @@ void setup() {
   }  
 
   bst = new BSTween(100);
-
+  
   testDot = new Dot(new PVector(width/3, height/3));
   testDot.rad = 36f;
   testDot.c = color(255, 255, 0);
-
+  
   mst = new MSTween(4, "mySimpleTestMethod", testDot);
   mst.setTimeToSeconds();
-
-  //pvst.onEnd(testDot, "mySimpleTestMethod");
 } // end setup
 
 
 void draw() {
   background(255);
-
-  if (frameCount % 5 == 0) {
-    //println("pvst.isPlaying() : " + pvst.isPlaying() + " pvst.isDone(): " + pvst.isDone());
-    //println("mst.isPlaying(): " + mst.isPlaying());
-  }
+  
+  
 
   for (Dot d : dots) d.display();
 
@@ -104,9 +99,9 @@ void draw() {
   if (bst.fire()) {
     println(frameCount + " bst fire()");
   } // end if
-
+  
   testDot.display();
-
+  
   fill(0);
   textAlign(LEFT);
   text("frameRate: " + (int)frameRate, 20, height - 20);
@@ -119,16 +114,21 @@ void drawCross(PVector loc) {
 
 void mouseReleased() {  
   fst.playLive(mouseX);
-
-  if (!pvst.isPlaying()) pvst.playLive(new PVector(mouseX, mouseY), 5, 0);
-  else pvst.playLive(new PVector(mouseX, mouseY),2, 0);
-
-  //pvst.playLive(new PVector(mouseX, mouseY));
+  
+  //if (!pvst.isPlaying()) pvst.playLive(new PVector(mouseX, mouseY), 10, 0);
+  //else pvst.playLive(new PVector(mouseX, mouseY), 2, 0);
+  
+  pvst.playLive(new PVector(mouseX, mouseY));
   println("clicked: " + frameCount + "... " + nf((float)millis() / 1000, 0, 2));
   tempPrintDone = true;
   //cst.playLive(cursorColor);
-  bst.playLive(100);
+  //bst.playLive(100);
   mst.play();
+ /*
+  FSTween sample = new FSTween(100, 0, 0, 1);
+  sample.onEnd(testDot, "sayHello");
+  sample.play();
+  */
 } // end mouseReleased
 
 
@@ -155,7 +155,7 @@ void keyReleased() {
   } 
 
   if (key == 'o') {
-    pvst.onEnd(testDot, "totalTest");
+   pvst.onEnd(testDot, "totalTest");
   }
 
   if (key == 't') {
@@ -186,28 +186,29 @@ void keyReleased() {
   if (key == 'q') pvst.setDuration(3);
   if (key == 'w') pvst.setDuration(6);
   if (key == 'e') {
-    println("pvst.getEnd(): " + pvst.getEnd());
+   println("pvst.getEnd(): " + pvst.getEnd());
+    
   }
   if (key == 'f') pvst.setDelay(1);
 
   if (key == 'c') {
-    pvst.toggleAdjustForFasterPlayLive();
+   pvst.toggleAdjustForFasterPlayLive(); 
   }
-
+  
   if (key == 'd') {
-    for (int i = 0; i < dots.size(); i++) {
-      dots.get(i).pos.setTimeToSeconds();
-      dots.get(i).pos.playLive(new PVector(random(width), random(height)), random(2, 5), random(0, 3));
-    }
+   for (int i = 0; i < dots.size(); i++) {
+     dots.get(i).pos.setTimeToSeconds();
+    dots.get(i).pos.playLive(new PVector(random(width), random(height)), random(2, 5), random(0,3));
+   }  
   }
-
+  
   if (keyCode == SHIFT) {
     pvst.jitter(new PVector(10, 0, 0), 20, 0);
   } 
-
+  
   if (key == '9') {
     println("trying to stop mst");
-    mst.stop();
+   mst.stop(); 
   }
 } // end keyReleased
 
@@ -239,25 +240,26 @@ class Dot {
     float b = pos.value().y;
     rectMode(CENTER);
     rect(a, b, rad / 2, rad / 2);
-    if (sayHello) {
-      fill(0);
-      textAlign(CENTER);
-      text("hello", pos.value().x, pos.value().y + 50);
+    if (sayHello){
+     fill(0);
+     textAlign(CENTER);
+    text("hello", pos.value().x, pos.value().y + 50); 
     }
   } // end display
-
+  
   void sayHello() {
     sayHello = !sayHello;
   } // end sayHello
-
-    void totalTest() {
+  
+  void totalTest() {
     c = color(0);
     println(frameCount + "--- totalTest");
   } // end totalTest
+  
 
+void mySimpleTestMethod() {
+  println(frameCount + "--- this is my simple test method");
+} // end mySimpleTestMethod
 
-  void mySimpleTestMethod() {
-    println(frameCount + "--- this is my simple test method");
-  } // end mySimpleTestMethod
+  
 } // end class Dot
-

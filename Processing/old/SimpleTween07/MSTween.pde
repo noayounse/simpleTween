@@ -27,19 +27,9 @@ class MSTween {
     return st.getTimeMode();
   } // end getTimeMode
 
-
-  public boolean isPlaying() {
-    return st.isPlaying();
-  } // end isPlaying
-  
-  public float value() {
-    return st.valueFloatArray()[0];
-  } // end value
-
     void play() {
     if (!st.isPlaying()) st.onEnd(targetObj, methodName);
     st.play();
-    
   } // end play
   
   public void stop() {

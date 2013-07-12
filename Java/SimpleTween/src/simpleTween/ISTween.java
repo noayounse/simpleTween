@@ -12,7 +12,7 @@ public class ISTween extends STweenManager {
 		float[] brokenValues = breakUp(valueIn);
 		super.setCurrent(brokenValues);
 	} // end setCurrent
-	
+
 	public void setBegin(int valueIn) {
 		float[] brokenValues = breakUp((float) valueIn);
 		super.setBegin(brokenValues);
@@ -40,6 +40,15 @@ public class ISTween extends STweenManager {
 	public void playLive(int valueIn, float durationIn, float delayIn) {
 		super.playLive(breakUp((float) valueIn), durationIn, delayIn);
 	} // end playLive
+
+	public void jitter(int valueIn) {
+		STween lastTween = super.allTweens.get(0);
+		jitter(valueIn, lastTween.getDuration() / 4f, 0);
+	} // end jitter
+
+	public void jitter(int valueIn, float durationIn, float delayIn) {
+		super.jitter(breakUp(valueIn), durationIn, delayIn);
+	} // end jitter
 
 	public int value() {
 		float[] broken = super.valueFloatArray();

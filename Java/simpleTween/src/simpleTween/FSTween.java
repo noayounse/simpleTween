@@ -11,7 +11,7 @@ public class FSTween extends STweenManager {
 		float[] brokenValues = breakUp(valueIn);
 		super.setCurrent(brokenValues);
 	} // end setCurrent
-	
+
 	public void setBegin(float valueIn) {
 		float[] brokenValues = breakUp(valueIn);
 		super.setBegin(brokenValues);
@@ -39,6 +39,15 @@ public class FSTween extends STweenManager {
 	public void playLive(float valueIn, float durationIn, float delayIn) {
 		super.playLive(breakUp(valueIn), durationIn, delayIn);
 	} // end playLive
+
+	public void jitter(float valueIn) {
+		STween lastTween = super.allTweens.get(0);
+		jitter(valueIn, lastTween.getDuration() / 4f, 0);
+	} // end jitter
+
+	public void jitter(float valueIn, float durationIn, float delayIn) {
+		super.jitter(breakUp(valueIn), durationIn, delayIn);
+	} // end jitter
 
 	public float value() {
 		float[] broken = super.valueFloatArray();

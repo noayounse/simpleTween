@@ -53,7 +53,6 @@ public class SimpleTween implements PConstants {
 	public final static int FRAMES_MODE = 1;
 	public final static int SECONDS_MODE = 2;
 	public static int baseTimeMode = FRAMES_MODE;
-	
 
 	// easing constants
 	public final static int LINEAR = 0;
@@ -64,6 +63,9 @@ public class SimpleTween implements PConstants {
 	public final static int CUBIC_IN = 22;
 	public final static int CUBIC_OUT = 23;
 	public static int baseEasingMode = QUARTIC_BOTH;
+
+	// global pause
+	public static boolean globalSTpaused = false;
 
 	public final static String VERSION = "##library.prettyVersion##";
 
@@ -81,7 +83,7 @@ public class SimpleTween implements PConstants {
 	public static void begin(PApplet theParent) {
 		parent = theParent;
 	}
-	
+
 	/**
 	 * return the version of the library.
 	 * 
@@ -111,16 +113,30 @@ public class SimpleTween implements PConstants {
 		return 0;
 	}
 
+	public static void pauseAll() {
+		globalSTpaused = true;
+	} // end pauseAll
+
+	public static void resumeAll() {
+		globalSTpaused = false;
+	} // end resume all
+
+	public static boolean isPaused() {
+		return globalSTpaused;
+	} // end isPaused
+
 	public static void setTimeToSeconds() {
 		baseTimeMode = SECONDS_MODE;
 	} // end setTimeToSeconds
+
 	public static void setTimeToFrames() {
 		baseTimeMode = FRAMES_MODE;
 	} // end setTimeToSeconds
+
 	public static int getTimeMode() {
-	return baseTimeMode;	
+		return baseTimeMode;
 	} // end getTimeMode
-	
+
 	public static void setModeLinear() {
 		baseEasingMode = LINEAR;
 	} // end setModeLinear
@@ -148,11 +164,11 @@ public class SimpleTween implements PConstants {
 	public static void setModeQuintIn() {
 		baseEasingMode = QUINT_IN;
 	} // end setModeQuintIn
-	
+
 	public static int getEasingMode() {
 		return baseEasingMode;
 	} // end getEasingMode
-	
+
 	public static float[] append(float[] fIn, float addition) {
 		float[] result = Arrays.copyOf(fIn, fIn.length + 1);
 		result[fIn.length] = addition;

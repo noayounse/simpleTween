@@ -3,9 +3,10 @@ package simpleTween;
 import java.util.ArrayList;
 
 public class STweenManager {
-	ArrayList<STween> allTweens = new ArrayList<STween>();
+	public ArrayList<STween> allTweens = new ArrayList<STween>();
+	private ArrayList<STween> jitterTweens = new ArrayList<STween>();
 
-	ArrayList<OnEnd> onEnds = new ArrayList<OnEnd>();
+	private ArrayList<OnEnd> onEnds = new ArrayList<OnEnd>();
 
 	public float[] brokenValuesStart;
 	public float[] brokenValuesEnd;
@@ -28,11 +29,13 @@ public class STweenManager {
 		brokenValuesStart = brokenValuesStart_;
 		brokenValuesEnd = brokenValuesEnd_;
 
-		for (int i = 0; i < degree; i++)
+		for (int i = 0; i < degree; i++) {
 			allTweens.add(new STween(duration_, delay_, brokenValuesStart[i],
 					brokenValuesEnd[i]));
-		for (int i = 0; i < degree; i++)
 			allTweens.get(i).setMode(base.mode);
+			jitterTweens.add(new STween(duration_ / 4, delay_, 0, 0));
+			jitterTweens.get(i).setMode(base.mode);
+		}
 	} // end setInitialTweens
 
 	public void setModeLinear() {
@@ -74,10 +77,11 @@ public class STweenManager {
 		for (int i = 0; i < degree; i++)
 			allTweens.get(i).setMode(base.mode);
 	} // end setMode
-	
+
 	public void setMode(int modeIn) {
 		base.setMode(modeIn);
-		for (int i = 0; i < degree; i++) allTweens.get(i).setMode(modeIn);
+		for (int i = 0; i < degree; i++)
+			allTweens.get(i).setMode(modeIn);
 	} // end setMode
 
 	public void setTimeToFrames() {
@@ -114,10 +118,15 @@ public class STweenManager {
 		for (int i = 0; i < allTweens.size(); i++)
 			allTweens.get(i).pause();
 	} // end pause
-	
+
 	public boolean isPaused() {
 		return allTweens.get(0).isPaused();
 	} // end isPaused
+
+	public void resume() {
+		for (int i = 0; i < allTweens.size(); i++)
+			allTweens.get(i).resume();
+	} // end resume
 
 	public void reset() {
 		for (int i = 0; i < allTweens.size(); i++)
@@ -129,21 +138,23 @@ public class STweenManager {
 		for (int i = 0; i < onEnds.size(); i++) {
 			onEnds.get(i).quit();
 		}
-	 } // end quitOnEnds
-	
+	} // end quitOnEnds
+
 	public void setCurrent(float[] valuesIn) {
 		reset();
 		setBegin(valuesIn);
 	} // end setCurrent
-	
+
 	public void setBegin(float[] valuesIn) {
 		for (int i = 0; i < allTweens.size(); i++)
 			allTweens.get(i).setBegin(valuesIn[i]);
 	} // end setBegin
 
 	public void setEnd(float[] valuesIn) {
-		for (int i = 0; i < allTweens.size(); i++)
+		for (int i = 0; i < allTweens.size(); i++) {
 			allTweens.get(i).setEnd(valuesIn[i]);
+		}
+
 	} // end setEnd
 
 	public void setDuration(float durationIn) {
@@ -158,14 +169,14 @@ public class STweenManager {
 
 	public float[] getBrokenBegin() {
 		float[] broken = new float[degree];
-		for (int i = allTweens.size() - 1; i < allTweens.size(); i++)
+		for (int i = 0; i < degree; i++)
 			broken[i] = allTweens.get(i).getBegin();
 		return broken;
 	} // end getBrokenBegin
 
 	public float[] getBrokenEnd() {
 		float[] broken = new float[degree];
-		for (int i = allTweens.size() - 1; i < allTweens.size(); i++)
+		for (int i = 0; i < degree; i++)
 			broken[i] = allTweens.get(i).getEnd();
 		return broken;
 	} // end getBrokenEnd
@@ -202,16 +213,25 @@ public class STweenManager {
 			for (int i = 0; i < degree; i++) {
 				allTweens.get(i).playLive(valuesIn[i], durationIn, delayIn);
 			}
-			for (int i = 0; i < degree; i++) allTweens.get(i).adjustDurations();
 		}
 		// start any onEnds
 		startOnEnds();
-	} // end playLive
+	}// end playLive
+
+	public void jitter(float[] valuesIn, float durationIn, float delayIn) {
+		for (int i = 0; i < degree; i++) {
+			jitterTweens.get(i).playLive(valuesIn[i], durationIn / 2, delayIn);
+			jitterTweens.get(i).playLive(0, durationIn / 2,
+					durationIn / 2 + delayIn);
+		}
+	} // end jitter
 
 	public float[] valueFloatArray() {
 		float[] broken = new float[degree];
-		for (int j = 0; j < degree; j++)
+		for (int j = 0; j < degree; j++) {
 			broken[j] += allTweens.get(j).value();
+			broken[j] += jitterTweens.get(j).value();
+		}
 
 		// look for and assign any nextTargets
 		if (hasStarted() && !isPlaying() && isDone() && nextTargets.size() > 0) {
@@ -303,7 +323,6 @@ public class STweenManager {
 			if (onEnds.get(i).running) {
 				onEnds.get(i).quit();
 			}
-			onEnds.remove(i);
 		}
 	} // end clearOnEnds
 

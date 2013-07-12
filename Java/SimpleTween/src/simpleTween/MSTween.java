@@ -31,7 +31,7 @@ public class MSTween {
 			return true;
 		return false;
 	} // end isPlaying
-	
+
 	public void pause() {
 		st.quitOnEnds();
 	} // end pause
@@ -41,5 +41,11 @@ public class MSTween {
 			st.onEnd(targetObj, methodName);
 		st.play();
 	} // end play
+
+	public void stop() {
+		if (st.isPlaying()) {
+			st.clearOnEnds();
+		}
+	} // end stop
 } // end class BSTween
 

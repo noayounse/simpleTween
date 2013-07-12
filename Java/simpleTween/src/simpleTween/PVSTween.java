@@ -3,7 +3,8 @@ package simpleTween;
 //PVector SimpleTween
 public class PVSTween extends STweenManager {
 
-	public PVSTween(float duration_, float delay_, processing.core.PVector startPV_, processing.core.PVector endPV_) {
+	public PVSTween(float duration_, float delay_,
+			processing.core.PVector startPV_, processing.core.PVector endPV_) {
 		super(3);
 		setInitialTweens(duration_, delay_, breakUp(startPV_), breakUp(endPV_));
 	} // end constructor
@@ -12,7 +13,7 @@ public class PVSTween extends STweenManager {
 		float[] brokenValues = breakUp(valueIn);
 		super.setCurrent(brokenValues);
 	} // end setCurrent
-	
+
 	public void setBegin(processing.core.PVector valueIn) {
 		float[] brokenValues = breakUp(valueIn);
 		super.setBegin(brokenValues);
@@ -38,9 +39,19 @@ public class PVSTween extends STweenManager {
 		playLive(valueIn, lastTween.getDuration(), 0);
 	} // end playLive
 
-	public void playLive(processing.core.PVector valueIn, float durationIn, float delayIn) {
+	public void playLive(processing.core.PVector valueIn, float durationIn,
+			float delayIn) {
 		super.playLive(breakUp(valueIn), durationIn, delayIn);
 	} // end playLive
+
+	public void jitter(processing.core.PVector valueIn) {
+		STween lastTween = super.allTweens.get(0);
+		jitter(valueIn, lastTween.getDuration() / 4f, 0);
+	} // end jitter
+
+	public void jitter(processing.core.PVector valueIn, float durationIn, float delayIn) {
+		super.jitter(breakUp(valueIn), durationIn, delayIn);
+	} // end jitter
 
 	public processing.core.PVector value() {
 		float[] broken = super.valueFloatArray();
@@ -56,7 +67,8 @@ public class PVSTween extends STweenManager {
 	} // end breakUp
 
 	private processing.core.PVector compose(float[] floatsIn) {
-		return new processing.core.PVector(floatsIn[0], floatsIn[1], floatsIn[2]);
+		return new processing.core.PVector(floatsIn[0], floatsIn[1],
+				floatsIn[2]);
 	} // end compose
 
 	public void addNextTarget(processing.core.PVector valueIn) {
@@ -69,8 +81,8 @@ public class PVSTween extends STweenManager {
 				timeModeIn);
 	} // end addNextTarget
 
-	public void addNextTarget(float durationIn, float delayIn, processing.core.PVector valueIn,
-			int timeModeIn) {
+	public void addNextTarget(float durationIn, float delayIn,
+			processing.core.PVector valueIn, int timeModeIn) {
 		super.addNextTarget(durationIn, delayIn, breakUp(valueIn), timeModeIn);
 	} // end addNextTarget
 } // end class PVSTween

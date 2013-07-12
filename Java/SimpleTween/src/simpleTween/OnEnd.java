@@ -26,6 +26,7 @@ public class OnEnd extends Thread {
 		while (running) {
 			if (SimpleTween.parent.frameCount != lastFrame) {
 				try {
+					float iterate = referenceObj.valueFloatArray()[0];
 					if (referenceObj.isDone()
 							&& referenceObj.nextTargets.size() == 0) {
 						playFunction();

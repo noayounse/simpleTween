@@ -11,7 +11,7 @@ class STween {
   boolean isPlaying = false;
   boolean hasStarted = false;
   boolean paused = false;
-  boolean isDone = false;
+  
 
 
   float currentValue = 0f;
@@ -22,7 +22,13 @@ class STween {
 
   // ********** //
   float[][] runTimes = new float[0][0]; // [0-conception time][1-start time][2-end time][3-startValue][4-endValue] -- chaing vars[5-original end time][6-new end time][7-new end time inception]
+  float[] lastStep = new float[0]; // records last step for this runtime
   float[] lastTime = new float[0]; // records the last time
+
+
+  /******/
+  float lastRunTime = 0f; // the most recent play or playLive will set this.  any other playLives will lerp back to hit this time
+  float lastRunTimeInception = 0; // frame or time when this last run time was established
 
 
 
@@ -39,7 +45,7 @@ class STween {
     currentValue = startValue_;
     startValue = startValue_;
     endValue = endValue_;
-
+    
     //    conception = frameCount;
     duration = duration_;
 
@@ -49,6 +55,7 @@ class STween {
     originalEndValue = endValue_;
     originalDuration = duration_;
     originalDelay = delay_;
+
   } // end constructor
 
   void setModeLinear () {
@@ -120,38 +127,46 @@ class STween {
     return currentValue;
   } // end getCurrent
 
-  float getDuration() {
-    return duration;
-  } // end getDuration
+  /*
+  void play() {
+   if (isPlaying && paused) {
+   paused = false;
+   }
+   else {
+   isPlaying = true;
+   hasStarted = true;
+   lastFrame = frameCount - 1;
+   currentValue = startValue;    
+   resetSteps();
+   calculateSteps();
+   }
+   } // end play
+   */
 
-    float getDelay() {
-    return delay;
-  } // end getDelay
-
-    void play() {
+  void play() {
     isPlaying = true;
     hasStarted = true;
-    isDone = false;
     lastFrame = frameCount - 1;
     currentValue = startValue;    
     resetSteps();
     calculateSteps();
+
   } // end play  
 
+
+  // ************* //
   void resume() {
     paused = false;
   } // end resume
 
+
     void pause() {
-    if (isPlaying) {
-      paused = true;
-    }
+    if (isPlaying) paused = true;
   } // end pause
 
     void reset() {
     isPlaying = false;
     paused = false;
-    isDone = false;
     setBegin(originalStartValue);
     setEnd(originalEndValue);
     setDuration(originalDuration);
@@ -169,6 +184,7 @@ class STween {
     playLive(endValueIn, duration, 0);
   }
   void playLive (float endValueIn, float durationIn, float delayIn) {
+
     if (isPlaying) {
       startValue = endValue;
     }
@@ -176,7 +192,9 @@ class STween {
       resetSteps();
       startValue = currentValue;
     }
-
+    
+    println("IN PLAYLIVE.  ENDVALUE AS : "  + endValueIn);
+    
     endValue = endValueIn;
     duration = durationIn;
     delay = delayIn;
@@ -184,20 +202,21 @@ class STween {
     isPlaying = true;
     paused = false;
     hasStarted = true;
-    isDone = false;
     //}
   } // end playLive
 
     void resetSteps() {
     runTimes = new float[0][0];
-    //lastStep = new float[0];
+    lastStep = new float[0];
     lastTime = new float[0];
     //    lastRunTime = 0f;
   } 
-
+  
 
   void calculateSteps() {
     float[] newRunTimes = new float[8];
+
+
     if (timeMode == FRAMES_MODE) {
       newRunTimes[0] = frameCount;
       newRunTimes[1] = delay + newRunTimes[0];
@@ -209,14 +228,40 @@ class STween {
       newRunTimes[2] = newRunTimes[1] + 1000 * (duration);
     }
 
+    newRunTimes[5] = newRunTimes[2];
+    newRunTimes[6] = newRunTimes[2];
+    newRunTimes[7] = newRunTimes[0];
+    lastRunTimeInception = newRunTimes[0];
+    lastRunTime = newRunTimes[2];
+
+
     newRunTimes[3] = startValue;
     newRunTimes[4] = endValue;
     runTimes = (float[][])append(runTimes, newRunTimes);
-    //lastStep = (float[])append(lastStep, 0f);
+    lastStep = (float[])append(lastStep, 0f);
     lastTime = (float[])append(lastTime, 0f);
   } // end calculateSteps
 
 
+  void adjustDurations() {
+      for (int i = 0; i < runTimes.length; i++) {
+        if (lastRunTime < runTimes[i][6]) {
+          runTimes[i][5] = runTimes[i][6];
+          runTimes[i][6] = lastRunTime;
+          runTimes[i][7] = lastRunTimeInception;
+        }
+      }
+    
+    // / [0-conception time][1-start time][2-end time][3-startValue][4-endValue] -- chaing vars[5-original end time][6-new end time][7-new end time inception]
+    /*
+            if (runTimes[i][6] < runTimes[i][5]) {
+     if (timeMode == FRAMES_MODE) runTimes[i][2] = constrain(map(frameCount, runTimes[i][7], lastRunTime, runTimes[i][5], runTimes[i][6]), runTimes[i][6], runTimes[i][5]);
+     else runTimes[i][2] = constrain(map(millis(), runTimes[i][7], lastRunTime, runTimes[i][5], runTimes[i][6]), runTimes[i][6], runTimes[i][5]);
+     } 
+     */
+
+    // adjust the runTimes[i][2] if the most recent one is shorter
+  } // ene adjustDurations
 
 
 
@@ -229,96 +274,105 @@ class STween {
             if (timeMode == FRAMES_MODE) {
               runTimes[i][1]++;
               runTimes[i][2]++;
+              runTimes[i][5]++;
+              runTimes[i][6]++;
+              runTimes[i][7]++;
+
+              // ******** // 
+              lastRunTimeInception++;
               lastTime[i] = frameCount;
             }
             else {
               float millisDiff = millis() - lastTime[i];
               runTimes[i][1] += millisDiff;
               runTimes[i][2] += millisDiff;
+              runTimes[i][5] += millisDiff;
+              runTimes[i][6] += millisDiff;
+              runTimes[i][7] += millisDiff;
               lastTime[i] = millis();
+
+              // ************************ // 
+              lastRunTimeInception+= millisDiff;
             }
           }
         }
       } 
       else {
-        float lastValue = 0;
         for (int i = 0; i < runTimes.length; i++) {
           if (frameCount != lastFrame) {
-            if (i == 0) lastValue = runTimes[i][3];
-            if (timeMode == FRAMES_MODE) {
-              if (i == 0 && frameCount >= runTimes[i][2]) {
-                lastValue = runTimes[i][4];
-              } 
 
-              // reset the start value based on the previous end value
-              runTimes[i][3] = lastValue;
-              if (frameCount <= runTimes[i][2] && frameCount >= runTimes[i][1]) {      
-                lastValue = getStep(runTimes[i]);
-              }
-              else if (frameCount > runTimes[i][2]) {
-                lastValue = runTimes[i][4];
-                if (i == runTimes.length - 1 && frameCount >= runTimes[runTimes.length - 1][2]) {
-                  lastValue = runTimes[i][4];
-                  clearArrays();
-                  break;
-                }
-              }
-              else {
-              }
+            // ***************************************** //  
+            if (runTimes[i][6] < runTimes[i][5]) {
+              if (timeMode == FRAMES_MODE) runTimes[i][2] = constrain(map(frameCount, runTimes[i][7], runTimes[i][6], runTimes[i][5], runTimes[i][6]), runTimes[i][6], runTimes[i][5]);
+              else runTimes[i][2] = constrain(map(millis(), runTimes[i][7], runTimes[i][6], runTimes[i][5], runTimes[i][6]), runTimes[i][6], runTimes[i][5]);
             } 
-            else {
-              lastTime[i] = millis();
-              if (i == 0 && millis() >= runTimes[i][2]) {
-                lastValue = runTimes[i][4];
-              }
 
-              // reset the start value based on the previous end value
-              runTimes[i][3] = lastValue;
-              if (millis() <= runTimes[i][2] && millis() >= runTimes[i][1]) {
-                lastValue = getStep(runTimes[i]);
-              }
-              else if (millis() > runTimes[i][2]) {
-                lastValue = runTimes[i][4];
-                if (i == runTimes.length - 1 && millis() >= runTimes[runTimes.length - 1][2]) {
-                  lastValue = runTimes[i][4];
-                  clearArrays();
-                  break;
-                }
+
+
+            if (timeMode == FRAMES_MODE) {
+              if (frameCount <= runTimes[i][2] && frameCount >= runTimes[i][1]) { 
+                float newStepSize = getStep(runTimes[i]);
+                float adjustedStep = newStepSize - lastStep[i]; 
+                currentValue += adjustedStep;
+                lastStep[i] = newStepSize;
               }
             }
-            currentValue = lastValue;
+            else {
+              if (millis() <= runTimes[i][2] && millis() >= runTimes[i][1]) {
+                float newStepSize = getStep(runTimes[i]);
+                float adjustedStep = newStepSize - lastStep[i]; 
+                currentValue += adjustedStep;
+                lastStep[i] = newStepSize;
+              }
+            }
+          }
+        }
+      }
+
+      // record the last times
+      for (int i = 0; i < runTimes.length; i++) {
+        if (frameCount != lastFrame) {
+          if (timeMode == FRAMES_MODE) {
+            lastTime[i] = frameCount;
+          }
+          else {
+
+            lastTime[i] = millis();
           }
         }
       }
       if (frameCount != lastFrame) lastFrame = frameCount;
     }
-    else { // does not have steps
-      //isPlaying = false;
-      if (hasStarted) {
-        clearArrays();
-      }
+
+
+    else {
+      isPlaying = false;
     } 
 
     // adjust the final value when the tween is done
-    if (isDone) {
+    if (isDone()) {
       currentValue = endValue;
     } 
     else if (!hasStarted && !isPlaying) {
       currentValue = startValue;
     }
 
+
+
+
     return currentValue;
   } // end value
 
 
-    void clearArrays() {
-    println(frameCount + " should stop");
-    runTimes = new float[0][0];
-    isPlaying = false;
-    isDone = true;
-  } // end clearArray
 
-  boolean hasSteps() {
+
+
+
+
+
+
+
+    boolean hasSteps() {
     if (timeMode == FRAMES_MODE) {
       for (float[] f : runTimes) if (frameCount <= f[2]) return true;
     } 
@@ -334,7 +388,8 @@ class STween {
   } // end isPlaying
 
   boolean isDone() {
-    return isDone;
+    if (!hasSteps() && runTimes.length > 0) return true;
+    return false;
   } // end isDone
 
     boolean hasStarted() {
@@ -345,9 +400,15 @@ class STween {
     hasStarted = false;
   } // end resetHasStarted
 
+  float getDuration() {
+    return duration;
+  } // end getDuration
 
+    float getDelay() {
+    return delay;
+  } // end getDelay
 
-  float getStep(float[] runTimeIn) {
+    float getStep(float[] runTimeIn) {
     float thisStep = 0f;
     // see http://www.gizma.com/easing/
     // t = current time -- frameCount - conception
@@ -358,9 +419,8 @@ class STween {
     if (timeMode == SECONDS_MODE) t = millis() - runTimeIn[1];
     float c = runTimeIn[4] - runTimeIn[3];
     float d = runTimeIn[2] - runTimeIn[1];
-    // ******** // 
-    float b = runTimeIn[3];
-    //float b = 0f;
+    //float b = runTimeIn[3];
+    float b = 0f;
     switch (mode) {
     case LINEAR :
       thisStep = c*t/d + b; 

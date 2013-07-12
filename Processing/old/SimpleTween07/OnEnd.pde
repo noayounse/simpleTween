@@ -21,10 +21,8 @@ class OnEnd extends Thread {
 
     void run() {
     while (running) {
-      if (frameCount != lastFrame) {
-       //println("referenceObj.isPlaying(): " + referenceObj.isPlaying() + " referenceObj.isDone(): " + referenceObj.isDone() + " value: " + referenceObj.valueFloatArray()[0]);
+      if (frameCount != lastFrame) { 
         try {
-          float iterate = referenceObj.valueFloatArray()[0];
           if (referenceObj.isDone() && referenceObj.nextTargets.size() == 0) {
             playFunction();
             this.quit();
