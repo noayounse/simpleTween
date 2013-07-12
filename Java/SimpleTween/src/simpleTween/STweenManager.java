@@ -32,57 +32,77 @@ public class STweenManager {
 		for (int i = 0; i < degree; i++) {
 			allTweens.add(new STween(duration_, delay_, brokenValuesStart[i],
 					brokenValuesEnd[i]));
-			allTweens.get(i).setMode(base.mode);
+			// allTweens.get(i).setMode(base.mode);
+			allTweens.get(i).setEase(base.getEase());
 			jitterTweens.add(new STween(duration_ / 4, delay_, 0, 0));
-			jitterTweens.get(i).setMode(base.mode);
+			// jitterTweens.get(i).setMode(base.mode);
+			jitterTweens.get(i).setEase(base.getEase());
 		}
 	} // end setInitialTweens
 
-	public void setModeLinear() {
-		base.setModeLinear();
-		setMode();
-	} // end setModeLinear
+	/*
+	 * public void setModeLinear() { base.setModeLinear(); setMode(); } // end
+	 * setModeLinear
+	 * 
+	 * public void setModeCubicBoth() { base.setModeCubicBoth(); setMode(); } //
+	 * end setModeCubic
+	 * 
+	 * public void setModeCubicIn() { base.setModeCubicIn(); setMode(); } // end
+	 * setModeCubicIn()
+	 * 
+	 * public void setModeCubicOut() { base.setModeCubicOut(); setMode(); } //
+	 * end setModeCubicOut()
+	 * 
+	 * public void setModeQuadBoth() { base.setModeQuadBoth(); setMode(); } //
+	 * end setModeQuadBot
+	 * 
+	 * public void setModeQuarticBoth() { base.setModeQuarticBoth(); setMode();
+	 * } // end setModeQuarticBoth
+	 * 
+	 * public void setModeQuintIn() { base.setModeQuintIn(); setMode(); } // end
+	 * setModeQuintIn
+	 * 
+	 * public void setMode() { for (int i = 0; i < degree; i++)
+	 * allTweens.get(i).setMode(base.mode); } // end setMode
+	 * 
+	 * public void setMode(int modeIn) { base.setMode(modeIn); for (int i = 0; i
+	 * < degree; i++) allTweens.get(i).setMode(modeIn); } // end setMode
+	 */
 
-	public void setModeCubicBoth() {
-		base.setModeCubicBoth();
-		setMode();
-	} // end setModeCubic
+	public void setEaseLinear() {
+		base.setEase(SimpleTween.EASE_LINEAR);
+		setEase();
+	} // end setEaseLinear
 
-	public void setModeCubicIn() {
-		base.setModeCubicIn();
-		setMode();
-	} // end setModeCubicIn()
+	public void setEaseInOut() {
+		base.setEase(SimpleTween.EASE_IN_OUT);
+		setEase();
+	} // end setEaseInOut
 
-	public void setModeCubicOut() {
-		base.setModeCubicOut();
-		setMode();
-	} // end setModeCubicOut()
+	public void setEaseIn() {
+		base.setEase(SimpleTween.EASE_IN);
+		setEase();
+	} // end setEaseIn
 
-	public void setModeQuadBoth() {
-		base.setModeQuadBoth();
-		setMode();
-	} // end setModeQuadBot
+	public void setEaseOut() {
+		base.setEase(SimpleTween.EASE_OUT);
+		setEase();
+	} // end setEaseOut
 
-	public void setModeQuarticBoth() {
-		base.setModeQuarticBoth();
-		setMode();
-	} // end setModeQuarticBoth
+	public void setEase(float[] easeIn) {
+		base.setEase(easeIn[0], easeIn[1], easeIn[2], easeIn[3]);
+		setEase();
+	} // end setEase
 
-	public void setModeQuintIn() {
-		base.setModeQuintIn();
-		setMode();
-	} // end setModeQuintIn
+	public void setEase(float x1, float y1, float x2, float y2) {
+		base.setEase(x1, y1, x2, y2);
+		setEase();
+	} // end setEase
 
-	public void setMode() {
+	private void setEase() {
 		for (int i = 0; i < degree; i++)
-			allTweens.get(i).setMode(base.mode);
-	} // end setMode
-
-	public void setMode(int modeIn) {
-		base.setMode(modeIn);
-		for (int i = 0; i < degree; i++)
-			allTweens.get(i).setMode(modeIn);
-	} // end setMode
+			allTweens.get(i).setEase(base.getEase());
+	} // end setEase
 
 	public void setTimeToFrames() {
 		setTimeMode(SimpleTween.FRAMES_MODE);
@@ -199,8 +219,8 @@ public class STweenManager {
 				for (int i = 0; i < degree; i++)
 					allTweens.add(new STween(durationIn, delayIn,
 							currentValues[i], valuesIn[i]));
-				for (int i = 0; i < degree; i++)
-					allTweens.get(i).setMode(base.mode);
+				//for (int i = 0; i < degree; i++) allTweens.get(i).setMode(base.mode);
+				for (int i = 0; i < degree; i++) allTweens.get(i).setEase(base.getEase());
 				for (int i = 0; i < degree; i++)
 					allTweens.get(i).setTimeMode(base.timeMode);
 				for (int i = 0; i < degree; i++)
@@ -251,7 +271,8 @@ public class STweenManager {
 		for (int i = 0; i < degree; i++) {
 			STween newDir = new STween(nextTarget.getDuration(),
 					nextTarget.getDelay(), allTweens.get(i).value(), nextTar[i]);
-			newDir.setMode(base.mode);
+			//newDir.setMode(base.mode);
+			newDir.setEase(base.getEase());
 			newDir.setTimeMode(nextTarget.timeMode);
 			newDir.play();
 			newDirection.add(newDir);
@@ -300,7 +321,8 @@ public class STweenManager {
 	} // end clearTargets
 
 	public STween setToBaseMode(STween stIn) {
-		stIn.setMode(base.mode);
+		//stIn.setMode(base.mode);
+		stIn.setEase(base.getEase());
 		return stIn;
 	} // end setToBaseMode
 

@@ -7,7 +7,8 @@ class BSTween extends STween {
 
   BSTween (float duration_) {
     super(duration_, 0, 0, 1);
-    super.setModeLinear();
+    //super.setModeLinear();
+    super.setEaseLinear();
   } // end constructor
 
     void playLive(float newDuration) {

@@ -55,6 +55,7 @@ public class SimpleTween implements PConstants {
 	public static int baseTimeMode = FRAMES_MODE;
 
 	// easing constants
+	/*
 	public final static int LINEAR = 0;
 	public final static int QUAD_BOTH = 1;
 	public final static int CUBIC_BOTH = 2;
@@ -63,6 +64,15 @@ public class SimpleTween implements PConstants {
 	public final static int CUBIC_IN = 22;
 	public final static int CUBIC_OUT = 23;
 	public static int baseEasingMode = QUARTIC_BOTH;
+	*/
+	
+
+	// easing presets
+	public final static float[] EASE_LINEAR = {.25f, .25f, .75f, .75f};
+	public final static float[] EASE_IN_OUT = { .55f, 0, .45f, 1 };
+	public final static float[] EASE_OUT = { 0, 0, .5f, 1 };
+	public final static float[] EASE_IN = { .5f, 0, 1, 1 };
+	public static float[] baseEasing = EASE_IN_OUT;
 
 	// global pause
 	public static boolean globalSTpaused = false;
@@ -137,6 +147,7 @@ public class SimpleTween implements PConstants {
 		return baseTimeMode;
 	} // end getTimeMode
 
+	/*
 	public static void setModeLinear() {
 		baseEasingMode = LINEAR;
 	} // end setModeLinear
@@ -164,10 +175,39 @@ public class SimpleTween implements PConstants {
 	public static void setModeQuintIn() {
 		baseEasingMode = QUINT_IN;
 	} // end setModeQuintIn
+	*/
 
-	public static int getEasingMode() {
-		return baseEasingMode;
+	
+	public void setEaseLinear() {
+		baseEasing = EASE_LINEAR;
+	} // end setEaseLinear
+
+	public void setEaseInOut() {
+		baseEasing = EASE_IN_OUT;
+	} // end setEaseInOut
+
+	public void setEaseIn() {
+		baseEasing = EASE_IN;
+	} // end setEaseIn
+
+	public void setEaseOut() {
+		baseEasing = EASE_OUT;
+	} // end setEaseOut
+	public void setEase(float[] easeIn) {
+		setEase(easeIn[0], easeIn[1], easeIn[2], easeIn[3]);
+	} // end setEase	
+	public void setEase(float x1, float y1, float x2, float y2) {
+		baseEasing = new float[4];
+		baseEasing[0] = x1;
+		baseEasing[1] = y1;
+		baseEasing[2] = x2;
+		baseEasing[3] = y2;
+	} // end setEase	
+	
+	public static float[] getEasing() {
+		return baseEasing;
 	} // end getEasingMode
+	
 
 	public static float[] append(float[] fIn, float addition) {
 		float[] result = Arrays.copyOf(fIn, fIn.length + 1);
@@ -178,6 +218,12 @@ public class SimpleTween implements PConstants {
 	public static float[][] append(float[][] fIn, float[] addition) {
 		float[][] result = Arrays.copyOf(fIn, fIn.length + 1);
 		result[fIn.length] = addition;
+		return result;
+	} // end append
+
+	public static KeySpline[] append(KeySpline[] splines, KeySpline keySpline) {
+		KeySpline[] result = Arrays.copyOf(splines, splines.length + 1);
+		result[splines.length] = keySpline;
 		return result;
 	} // end append
 

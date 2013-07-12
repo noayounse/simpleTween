@@ -29,16 +29,17 @@ class STweenManager {
     brokenValuesStart = brokenValuesStart_;
     brokenValuesEnd = brokenValuesEnd_;
 
-
-    // ************************************* // 
     for (int i = 0; i < degree; i++) {
       allTweens.add(new STween(duration_, delay_, brokenValuesStart[i], brokenValuesEnd[i]));  
-      allTweens.get(i).setMode(base.mode);
+      //allTweens.get(i).setMode(base.mode);
+      allTweens.get(i).setEase(base.getEase());
       jitterTweens.add(new STween(duration_ / 4, delay_, 0, 0));
-      jitterTweens.get(i).setMode(base.mode);
+      //jitterTweens.get(i).setMode(base.mode);
+      jitterTweens.get(i).setEase(base.getEase());
     }
   }  // end setInitialTweens
 
+/*
   void setModeLinear () {
     base.setModeLinear();
     setMode();
@@ -74,6 +75,36 @@ class STweenManager {
     base.setMode(modeIn);
     for (int i = 0; i < degree; i++) allTweens.get(i).setMode(modeIn);
   } // end setMode  
+  */
+  
+  
+  public void setEaseLinear() {
+    base.setEase(EASE_LINEAR);
+    setEase();
+  } // end setEaseLinear
+  public void setEaseInOut() {
+    base.setEase(EASE_IN_OUT);
+    setEase();
+  } // end setEaseInOut
+  public void setEaseIn() {
+    base.setEase(EASE_IN);
+    setEase();
+  } // end setEaseIn
+  public void setEaseOut() {
+    base.setEase(EASE_OUT);
+    setEase();
+  } // end setEaseOut
+  public void setEase(float[] easeIn) {
+    base.setEase(easeIn[0], easeIn[1], easeIn[2], easeIn[3]);
+    setEase();
+  } // end setEase
+  public void setEase(float x1, float y1, float x2, float y2) {
+    base.setEase(x1, y1, x2, y2);
+    setEase();
+  } // end setEase
+  private void setEase() {
+    for (int i = 0; i < degree; i++) allTweens.get(i).setEase(base.getEase());
+  } // end setEase
 
   void setTimeToFrames() {
     setTimeMode(FRAMES_MODE);
@@ -174,7 +205,8 @@ class STweenManager {
       if (nextTargets.size() == 0) {
         allTweens = new ArrayList<STween>();
         for (int i = 0; i < degree; i++) allTweens.add(new STween(durationIn, delayIn, currentValues[i], valuesIn[i]));
-        for (int i = 0; i < degree; i++) allTweens.get(i).setMode(base.mode);
+        //for (int i = 0; i < degree; i++) allTweens.get(i).setMode(base.mode);
+        for (int i = 0; i < degree; i++) allTweens.get(i).setEase(base.getEase());
         for (int i = 0; i < degree; i++) allTweens.get(i).setTimeMode(base.timeMode);
         for (int i = 0; i < degree; i++) allTweens.get(i).play();
       }
@@ -230,7 +262,8 @@ class STweenManager {
     ArrayList<STween> newDirection = new ArrayList<STween>();
     for (int i = 0; i < degree; i++) {
       STween newDir = new STween(nextTarget.duration, nextTarget.delay, allTweens.get(i).value(), nextTar[i]);
-      newDir.setMode(base.mode);
+      //newDir.setMode(base.mode);
+      newDir.setEase(base.getEase());
       newDir.setTimeMode(nextTarget.timeMode);
       newDir.play();
       newDirection.add(newDir);
@@ -270,7 +303,8 @@ class STweenManager {
   } // end clearTargets
 
   STween setToBaseMode(STween stIn) {
-    stIn.setMode(base.mode);
+    //stIn.setMode(base.mode);
+    stIn.setEase(base.getEase());
     return stIn;
   } // end setToBaseMode
 

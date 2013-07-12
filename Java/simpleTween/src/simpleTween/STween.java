@@ -26,7 +26,12 @@ public class STween {
 													// inception]
 	private float[] lastTime = new float[0]; // records the last time
 
-	public int mode = SimpleTween.baseEasingMode; // default
+	// public int mode = SimpleTween.baseEasingMode; // default
+	public float[] currentSplineType = SimpleTween.baseEasing;
+
+	public KeySpline[] splines = new KeySpline[0];
+	public KeySpline baseSpline = new KeySpline(currentSplineType[0],
+			currentSplineType[1], currentSplineType[2], currentSplineType[3]);
 
 	public STween(float duration_, float delay_, float startValue_,
 			float endValue_) {
@@ -42,37 +47,65 @@ public class STween {
 		originalDelay = delay_;
 	} // end constructor
 
-	public void setModeLinear() {
-		mode = SimpleTween.LINEAR;
-	} // end setModeLinear
+	/******/
+	/*
+	 * public void setModeLinear() { mode = SimpleTween.LINEAR; } // end
+	 * setModeLinear
+	 * 
+	 * public void setModeCubicBoth() { mode = SimpleTween.CUBIC_BOTH; } // end
+	 * setModeCubic
+	 * 
+	 * public void setModeCubicIn() { mode = SimpleTween.CUBIC_IN; } // end
+	 * setModeCubicIn
+	 * 
+	 * public void setModeCubicOut() { mode = SimpleTween.CUBIC_OUT; } // end
+	 * setModeCubicOut
+	 * 
+	 * public void setModeQuadBoth() { mode = SimpleTween.QUAD_BOTH; } // end
+	 * setModeQuadBot
+	 * 
+	 * public void setModeQuarticBoth() { mode = SimpleTween.QUARTIC_BOTH; } //
+	 * end setModeQuarticBoth
+	 * 
+	 * public void setModeQuintIn() { mode = SimpleTween.QUINT_IN; } // end
+	 * setModeQuintIn
+	 * 
+	 * public void setMode(int modeIn) { mode = modeIn; } // end setMode
+	 */
+	/******/
 
-	public void setModeCubicBoth() {
-		mode = SimpleTween.CUBIC_BOTH;
-	} // end setModeCubic
+	public void setEaseLinear() {
+		currentSplineType = SimpleTween.EASE_LINEAR;
+	} // end setEaseLinear
 
-	public void setModeCubicIn() {
-		mode = SimpleTween.CUBIC_IN;
-	} // end setModeCubicIn
+	public void setEaseInOut() {
+		currentSplineType = SimpleTween.EASE_IN_OUT;
+	} // end setEaseInOut
 
-	public void setModeCubicOut() {
-		mode = SimpleTween.CUBIC_OUT;
-	} // end setModeCubicOut
+	public void setEaseIn() {
+		currentSplineType = SimpleTween.EASE_IN;
+	} // end setEaseIn
 
-	public void setModeQuadBoth() {
-		mode = SimpleTween.QUAD_BOTH;
-	} // end setModeQuadBot
+	public void setEaseOut() {
+		currentSplineType = SimpleTween.EASE_OUT;
+	} // end setEaseOut
 
-	public void setModeQuarticBoth() {
-		mode = SimpleTween.QUARTIC_BOTH;
-	} // end setModeQuarticBoth
+	public void setEase(float[] easeIn) {
+		setEase(easeIn[0], easeIn[1], easeIn[2], easeIn[3]);
+	} // end setEase
 
-	public void setModeQuintIn() {
-		mode = SimpleTween.QUINT_IN;
-	} // end setModeQuintIn
+	public void setEase(float x1, float y1, float x2, float y2) {
+		currentSplineType = new float[4];
+		currentSplineType[0] = x1;
+		currentSplineType[1] = y1;
+		currentSplineType[2] = x2;
+		currentSplineType[3] = y2;
+		baseSpline.resetSplineControlPoints(currentSplineType);
+	} // end setEase
 
-	public void setMode(int modeIn) {
-		mode = modeIn;
-	} // end setMode
+	public float[] getEase() {
+		return currentSplineType;
+	} // end getEase
 
 	public void setTimeToFrames() {
 		setTimeMode(SimpleTween.FRAMES_MODE);
@@ -189,6 +222,8 @@ public class STween {
 
 	public void resetSteps() {
 		runTimes = new float[0][0];
+		splines = new KeySpline[0];
+		lastTime = new float[0];
 	}
 
 	public void calculateSteps() {
@@ -207,6 +242,7 @@ public class STween {
 
 		runTimes = SimpleTween.append(runTimes, newRunTimes);
 		lastTime = SimpleTween.append(lastTime, 0f);
+		splines = SimpleTween.append(splines, baseSpline.get());
 	} // end calculateSteps
 
 	public float value() {
@@ -214,12 +250,10 @@ public class STween {
 			// check the global pause if any
 			if (SimpleTween.globalSTpaused && !isPaused()) {
 				pause();
-			}
-			else if (!SimpleTween.globalSTpaused && isPaused()) {
+			} else if (!SimpleTween.globalSTpaused && isPaused()) {
 				resume();
 			}
-			
-			
+
 			// deal with pauses...
 			if (paused) {
 				for (int i = 0; i < runTimes.length; i++) {
@@ -255,7 +289,9 @@ public class STween {
 							runTimes[i][3] = lastValue;
 							if (SimpleTween.parent.frameCount <= runTimes[i][2]
 									&& SimpleTween.parent.frameCount >= runTimes[i][1]) {
-								lastValue = getStep(runTimes[i]);
+								// lastValue = getStep(runTimes[i]);
+								lastValue = getStep(runTimes[i], splines[i],
+										SimpleTween.parent.frameCount);
 							} else if (SimpleTween.parent.frameCount > runTimes[i][2]) {
 								lastValue = runTimes[i][4];
 								if (i == runTimes.length - 1
@@ -278,7 +314,9 @@ public class STween {
 							runTimes[i][3] = lastValue;
 							if (SimpleTween.parent.millis() <= runTimes[i][2]
 									&& SimpleTween.parent.millis() >= runTimes[i][1]) {
-								lastValue = getStep(runTimes[i]);
+								// lastValue = getStep(runTimes[i]);
+								lastValue = getStep(runTimes[i], splines[i],
+										SimpleTween.parent.millis());
 							} else if (SimpleTween.parent.millis() > runTimes[i][2]) {
 								lastValue = runTimes[i][4];
 								if (i == runTimes.length - 1
@@ -295,7 +333,7 @@ public class STween {
 			}
 			if (SimpleTween.parent.frameCount != lastFrame)
 				lastFrame = SimpleTween.parent.frameCount;
-			
+
 		} else { // does not have steps
 			// isPlaying = false;
 			if (hasStarted) {
@@ -310,7 +348,6 @@ public class STween {
 			currentValue = startValue;
 		}
 
-		
 		return currentValue;
 	} // end value
 
@@ -353,65 +390,15 @@ public class STween {
 		hasStarted = false;
 	} // end resetHasStarted
 
-	public float getStep(float[] runTimeIn) {
-		float thisStep = 0f;
-		// see http://www.gizma.com/easing/
-		// t = current time -- SimpleTween.parent.frameCount - conception
-		// b = start value -- startValue
-		// c = change in value -- (endValue - startValue)
-		// d = duration -- duration
-		float t = SimpleTween.parent.frameCount - runTimeIn[1];
-		if (timeMode == SimpleTween.SECONDS_MODE)
-			t = SimpleTween.parent.millis() - runTimeIn[1];
-		float c = runTimeIn[4] - runTimeIn[3];
-		float d = runTimeIn[2] - runTimeIn[1];
-		float b = runTimeIn[3];
-		// float b = 0f;
-		switch (mode) {
-		case SimpleTween.LINEAR:
-			thisStep = c * t / d + b;
-			break;
-		case SimpleTween.QUAD_BOTH:
-			t /= d / 2;
-			if (t < 1)
-				thisStep = c / 2 * t * t + b;
-			else {
-				t--;
-				thisStep = -c / 2 * (t * (t - 2) - 1) + b;
-			}
-			break;
-		case SimpleTween.CUBIC_BOTH:
-			t /= d / 2;
-			if (t < 1)
-				thisStep = c / 2 * t * t * t + b;
-			else {
-				t -= 2;
-				thisStep = c / 2 * (t * t * t + 2) + b;
-			}
-			break;
-		case SimpleTween.CUBIC_IN:
-			t /= d;
-			thisStep = c * t * t * t + b;
-			break;
-		case SimpleTween.CUBIC_OUT:
-			t /= d;
-			t--;
-			thisStep = c * (t * t * t + 1) + b;
-			break;
-		case SimpleTween.QUARTIC_BOTH:
-			t /= d / 2;
-			if (t < 1)
-				thisStep = c / 2 * t * t * t * t + b;
-			else {
-				t -= 2;
-				thisStep = -c / 2 * (t * t * t * t - 2) + b;
-			}
-			break;
-		case SimpleTween.QUINT_IN:
-			t /= d;
-			thisStep = c * t * t * t * t * t + b;
-			break;
-		} // end switch
-		return thisStep;
+	float getStep(float[] runTimeIn, KeySpline splineIn, float timeIn) {
+		float startValue = runTimeIn[3];
+		float endValue = runTimeIn[4];
+		float diff = endValue - startValue;
+		float startTime = runTimeIn[1];
+		float endTime = runTimeIn[2];
+		float percentOfTime = (float) (timeIn - startTime)
+				/ (endTime - startTime);
+		float splineValue = splineIn.findValue(percentOfTime);
+		return (splineValue * diff + startValue);
 	} // end getStep
 } // end class FST

@@ -30,7 +30,8 @@ void setup() {
 
   ist = new ISTween(10, 0, 20, 40);
   ist.setTimeToSeconds();
-  ist.setModeLinear();
+  //ist.setModeLinear();
+  ist.setEaseLinear();
 
   dots = new ArrayList<Dot>();
   float padding = 8;
@@ -168,11 +169,13 @@ void keyReleased() {
     //fst.reset();
     cst.reset();
   }
+  /*
   if (key == '1') pvst.setModeLinear();
   if (key == '2') pvst.setModeCubicBoth();
   if (key == '3') pvst.setModeQuadBoth();
   if (key == '4') pvst.setModeQuarticBoth();
   if (key == '5') pvst.setModeQuintIn();
+  */
 
   if (key == 'l') {
     pvst.addNextTarget(new PVector(mouseX, mouseY));

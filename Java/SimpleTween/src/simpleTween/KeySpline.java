@@ -1,3 +1,7 @@
+package simpleTween;
+
+import processing.core.PApplet;
+import processing.core.PVector;
 
 public class KeySpline { 
   public PVector pt1, pt2;
@@ -20,14 +24,14 @@ public class KeySpline {
     return cp;
   } // end get
 
-  public void resetSplineControlPoints(float[] valuesIn ) {
-    resetSplineControlPoints(valuesIn[0], valuesIn[1], valuesIn[2], valuesIn[3]);
+  public void resetSplineControlPoints(float[] valuesIn ){
+	  resetSplineControlPoints(valuesIn[0], valuesIn[1], valuesIn[2], valuesIn[3]);
   } // end resetSplineControlPoints
   public void resetSplineControlPoints(float mX1, float mY1, float mX2, float mY2) {
     pt1 = new PVector(mX1, mY1);
     pt2 = new PVector(mX2, mY2);
   } // end resetSplineControlPoints
-
+  
   public void setVisuals(PVector positionIn, float visualWidthIn, float visualHeightIn) {
     position = positionIn;
     visualWidth = visualWidthIn;
@@ -47,13 +51,13 @@ public class KeySpline {
   } // end findValue
 
   private float A(float aA1, float aA2) { 
-    return 1.0 - 3.0 * aA2 + 3.0 * aA1;
+    return (float) (1.0 - 3.0 * aA2 + 3.0 * aA1);
   }
   private float B(float aA1, float aA2) { 
-    return 3.0 * aA2 - 6.0 * aA1;
+    return (float) (3.0 * aA2 - 6.0 * aA1);
   }
   private float C(float aA1) { 
-    return 3.0 * aA1;
+    return (float) (3.0 * aA1);
   }
 
 
@@ -64,7 +68,7 @@ public class KeySpline {
 
   // Returns dx/dt given t, x1, and x2, or dy/dt given t, y1, and y2.
   private float GetSlope(float aT, float aA1, float aA2) {
-    return 3.0 * A(aA1, aA2)*aT*aT + 2.0 * B(aA1, aA2) * aT + C(aA1);
+    return (float) (3.0 * A(aA1, aA2)*aT*aT + 2.0 * B(aA1, aA2) * aT + C(aA1));
   }
 
   private float GetTForX(float aX) {
@@ -106,31 +110,31 @@ public class KeySpline {
     return new PVector();
   } // end getC2
 
-  public void drawBezier() {
+  public void drawBezier(PApplet parentIn) {
     if (position != null) {
       PVector p1 = getStartPosition();
       PVector p2 = getEndPosition();
       PVector c1 = getC1();
       PVector c2 = getC2();
 
-      stroke(0);
-      noFill();
-      rect(p1.x, p1.y, visualWidth, -visualHeight);
-      bezier(p1.x, p1.y, c1.x, c1.y, c2.x, c2.y, p2.x, p2.y);
+      parentIn.stroke(0);
+      parentIn.noFill();
+      parentIn.rect(p1.x, p1.y, visualWidth, -visualHeight);
+      parentIn.bezier(p1.x, p1.y, c1.x, c1.y, c2.x, c2.y, p2.x, p2.y);
 
-      fill(0);
-      ellipse(p1.x, p1.y, 4, 4);
+      parentIn.fill(0);
+      parentIn.ellipse(p1.x, p1.y, 4, 4);
 
-      fill(255, 0, 0);
-      ellipse(p2.x, p2.y, 4, 4);
+      parentIn.fill(255, 0, 0);
+      parentIn.ellipse(p2.x, p2.y, 4, 4);
 
-      fill(0, 255, 0);
-      ellipse(c1.x, c1.y, 6, 6);
-      line(p1.x, p1.y, c1.x, c1.y);
+      parentIn.fill(0, 255, 0);
+      parentIn.ellipse(c1.x, c1.y, 6, 6);
+      parentIn.line(p1.x, p1.y, c1.x, c1.y);
 
-      fill(0, 0, 255);
-      ellipse(c2.x, c2.y, 6, 6);
-      line(p2.x, p2.y, c2.x, c2.y);
+      parentIn.fill(0, 0, 255);
+      parentIn.ellipse(c2.x, c2.y, 6, 6);
+      parentIn.line(p2.x, p2.y, c2.x, c2.y);
     }
   } // end drawBezier
 
@@ -139,4 +143,3 @@ public class KeySpline {
     return builder;
   } // end toString
 } // end class KeySpline
-
