@@ -56,19 +56,15 @@ public class SimpleTween implements PConstants {
 
 	// easing constants
 	/*
-	public final static int LINEAR = 0;
-	public final static int QUAD_BOTH = 1;
-	public final static int CUBIC_BOTH = 2;
-	public final static int QUARTIC_BOTH = 3;
-	public final static int QUINT_IN = 20;
-	public final static int CUBIC_IN = 22;
-	public final static int CUBIC_OUT = 23;
-	public static int baseEasingMode = QUARTIC_BOTH;
-	*/
-	
+	 * public final static int LINEAR = 0; public final static int QUAD_BOTH =
+	 * 1; public final static int CUBIC_BOTH = 2; public final static int
+	 * QUARTIC_BOTH = 3; public final static int QUINT_IN = 20; public final
+	 * static int CUBIC_IN = 22; public final static int CUBIC_OUT = 23; public
+	 * static int baseEasingMode = QUARTIC_BOTH;
+	 */
 
 	// easing presets
-	public final static float[] EASE_LINEAR = {.25f, .25f, .75f, .75f};
+	public final static float[] EASE_LINEAR = { .25f, .25f, .75f, .75f };
 	public final static float[] EASE_IN_OUT = { .55f, 0, .45f, 1 };
 	public final static float[] EASE_OUT = { 0, 0, .5f, 1 };
 	public final static float[] EASE_IN = { .5f, 0, 1, 1 };
@@ -147,37 +143,33 @@ public class SimpleTween implements PConstants {
 		return baseTimeMode;
 	} // end getTimeMode
 
+	public static void setTimeMode(int timeModeIn) {
+		baseTimeMode = timeModeIn;
+	} // end setTimeMode
+
 	/*
-	public static void setModeLinear() {
-		baseEasingMode = LINEAR;
-	} // end setModeLinear
+	 * public static void setModeLinear() { baseEasingMode = LINEAR; } // end
+	 * setModeLinear
+	 * 
+	 * public static void setModeCubicBoth() { baseEasingMode = CUBIC_BOTH; } //
+	 * end setModeCubic
+	 * 
+	 * public static void setModeCubicIn() { baseEasingMode = CUBIC_IN; } // end
+	 * setModeCubicIn
+	 * 
+	 * public static void setModeCubicOut() { baseEasingMode = CUBIC_OUT; } //
+	 * end setModeCubicOut
+	 * 
+	 * public static void setModeQuadBoth() { baseEasingMode = QUAD_BOTH; } //
+	 * end setModeQuadBot
+	 * 
+	 * public static void setModeQuarticBoth() { baseEasingMode = QUARTIC_BOTH;
+	 * } // end setModeQuarticBoth
+	 * 
+	 * public static void setModeQuintIn() { baseEasingMode = QUINT_IN; } // end
+	 * setModeQuintIn
+	 */
 
-	public static void setModeCubicBoth() {
-		baseEasingMode = CUBIC_BOTH;
-	} // end setModeCubic
-
-	public static void setModeCubicIn() {
-		baseEasingMode = CUBIC_IN;
-	} // end setModeCubicIn
-
-	public static void setModeCubicOut() {
-		baseEasingMode = CUBIC_OUT;
-	} // end setModeCubicOut
-
-	public static void setModeQuadBoth() {
-		baseEasingMode = QUAD_BOTH;
-	} // end setModeQuadBot
-
-	public static void setModeQuarticBoth() {
-		baseEasingMode = QUARTIC_BOTH;
-	} // end setModeQuarticBoth
-
-	public static void setModeQuintIn() {
-		baseEasingMode = QUINT_IN;
-	} // end setModeQuintIn
-	*/
-
-	
 	public void setEaseLinear() {
 		baseEasing = EASE_LINEAR;
 	} // end setEaseLinear
@@ -193,21 +185,22 @@ public class SimpleTween implements PConstants {
 	public void setEaseOut() {
 		baseEasing = EASE_OUT;
 	} // end setEaseOut
+
 	public void setEase(float[] easeIn) {
 		setEase(easeIn[0], easeIn[1], easeIn[2], easeIn[3]);
-	} // end setEase	
+	} // end setEase
+
 	public void setEase(float x1, float y1, float x2, float y2) {
 		baseEasing = new float[4];
 		baseEasing[0] = x1;
 		baseEasing[1] = y1;
 		baseEasing[2] = x2;
 		baseEasing[3] = y2;
-	} // end setEase	
-	
+	} // end setEase
+
 	public static float[] getEasing() {
 		return baseEasing;
 	} // end getEasingMode
-	
 
 	public static float[] append(float[] fIn, float addition) {
 		float[] result = Arrays.copyOf(fIn, fIn.length + 1);
@@ -226,5 +219,16 @@ public class SimpleTween implements PConstants {
 		result[splines.length] = keySpline;
 		return result;
 	} // end append
+
+	public static float constrain(float floatIn, float low, float high) {
+		if (high < low) {
+			float temp = high;
+			high = low;
+			low = temp;
+		}
+		floatIn = floatIn >= low ? floatIn : low;
+		floatIn = floatIn <= high ? floatIn : high;
+		return floatIn;
+	} // end constrain
 
 }

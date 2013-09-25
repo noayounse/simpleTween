@@ -54,6 +54,7 @@ void setup() {
   mst.setTimeToSeconds();
 
   //pvst.onEnd(testDot, "mySimpleTestMethod");
+  
 } // end setup
 
 
@@ -111,6 +112,8 @@ void draw() {
   fill(0);
   textAlign(LEFT);
   text("frameRate: " + (int)frameRate, 20, height - 20);
+  
+
 } // end draw
 
 void drawCross(PVector loc) {
@@ -127,9 +130,10 @@ void mouseReleased() {
   //pvst.playLive(new PVector(mouseX, mouseY));
   println("clicked: " + frameCount + "... " + nf((float)millis() / 1000, 0, 2));
   tempPrintDone = true;
-  //cst.playLive(cursorColor);
+  cst.playLive(cursorColor);
   bst.playLive(100);
   mst.play();
+  
 } // end mouseReleased
 
 
@@ -205,7 +209,7 @@ void keyReleased() {
   }
 
   if (keyCode == SHIFT) {
-    pvst.jitter(new PVector(10, 0, 0), 20, 0);
+    //pvst.jitter(new PVector(10, 0, 0), 20, 0);
   } 
 
   if (key == '9') {

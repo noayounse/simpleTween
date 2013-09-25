@@ -33,13 +33,16 @@ class ISTween extends STweenManager {
     super.playLive(breakUp((float)valueIn), durationIn, delayIn);
   } // end playLive
 
+
+  /*
   public void jitter(int valueIn) {
-    STween lastTween = super.allTweens.get(0);
-    jitter(valueIn, lastTween.getDuration() / 4f, 0);
-  } // end jitter
-  public void jitter(int valueIn, float durationIn, float delayIn) {
-    super.jitter(breakUp(valueIn), durationIn, delayIn);
-  } // end jitter
+   STween lastTween = super.allTweens.get(0);
+   jitter(valueIn, lastTween.getDuration() / 4f, 0);
+   } // end jitter
+   public void jitter(int valueIn, float durationIn, float delayIn) {
+   super.jitter(breakUp(valueIn), durationIn, delayIn);
+   } // end jitter
+   */
 
 
   int value() {

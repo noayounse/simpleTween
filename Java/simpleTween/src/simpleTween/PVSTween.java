@@ -9,6 +9,13 @@ public class PVSTween extends STweenManager {
 		setInitialTweens(duration_, delay_, breakUp(startPV_), breakUp(endPV_));
 	} // end constructor
 
+	public PVSTween get() {
+		PVSTween dupe = new PVSTween(super.getDuration(), super.getDelay(),
+				getBegin(), getEnd());
+		dupe.setEase(base.getEase());
+		return dupe;
+	} // end get
+
 	public void setCurrent(processing.core.PVector valueIn) {
 		float[] brokenValues = breakUp(valueIn);
 		super.setCurrent(brokenValues);
@@ -44,14 +51,16 @@ public class PVSTween extends STweenManager {
 		super.playLive(breakUp(valueIn), durationIn, delayIn);
 	} // end playLive
 
-	public void jitter(processing.core.PVector valueIn) {
-		STween lastTween = super.allTweens.get(0);
-		jitter(valueIn, lastTween.getDuration() / 4f, 0);
-	} // end jitter
-
-	public void jitter(processing.core.PVector valueIn, float durationIn, float delayIn) {
-		super.jitter(breakUp(valueIn), durationIn, delayIn);
-	} // end jitter
+	/*
+	 * public void jitter(processing.core.PVector valueIn) { STween lastTween =
+	 * super.allTweens.get(0); jitter(valueIn, lastTween.getDuration() / 4f, 0);
+	 * } // end jitter
+	 * 
+	 * 
+	 * public void jitter(processing.core.PVector valueIn, float durationIn,
+	 * float delayIn) { super.jitter(breakUp(valueIn), durationIn, delayIn); }
+	 * // end jitter
+	 */
 
 	public processing.core.PVector value() {
 		float[] broken = super.valueFloatArray();

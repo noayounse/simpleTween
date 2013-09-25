@@ -1,15 +1,15 @@
- public final float[] EASE_LINEAR = {
+public final float[] EASE_LINEAR = {
   .25, .25, .75, .75
- }; 
-  public final float[] EASE_IN_OUT = {
-    .75, 0, .25, 1
-  };
-  public final float[] EASE_OUT = {
-    0, 0, .5, 1
-  };
-  public final float[] EASE_IN = {
-    .5, 0, 1, 1
-  };
+}; 
+public final float[] EASE_IN_OUT = {
+  .75, 0, .25, 1
+};
+public final float[] EASE_OUT = {
+  0, 0, .5, 1
+};
+public final float[] EASE_IN = {
+  .5, 0, 1, 1
+};
 
 
 // SimpleTween
@@ -46,17 +46,17 @@ class STween {
   public KeySpline[] splines = new KeySpline[0]; 
   public KeySpline baseSpline = new KeySpline(currentSplineType[0], currentSplineType[1], currentSplineType[2], currentSplineType[3]);
 
-/*
+  /*
 
-  final int LINEAR = 0;
-  final int QUAD_BOTH = 1;
-  final int CUBIC_BOTH = 2;
-  final int QUARTIC_BOTH = 3;
-  final int QUINT_IN = 20;
-  final int CUBIC_IN = 22;
-  final int CUBIC_OUT = 23;
-  int mode = CUBIC_BOTH; // default
-*/
+   final int LINEAR = 0;
+   final int QUAD_BOTH = 1;
+   final int CUBIC_BOTH = 2;
+   final int QUARTIC_BOTH = 3;
+   final int QUINT_IN = 20;
+   final int CUBIC_IN = 22;
+   final int CUBIC_OUT = 23;
+   int mode = CUBIC_BOTH; // default
+   */
 
 
   STween (float duration_, float delay_, float startValue_, float endValue_) {
@@ -75,32 +75,32 @@ class STween {
     originalDelay = delay_;
   } // end constructor
 
-/*
+  /*
   void setModeLinear () {
-    mode = LINEAR;
-  } // end setModeLinear
-  void setModeCubicBoth() {
-    mode = CUBIC_BOTH;
-  } // end setModeCubic
-  void setModeCubicIn() {
-    mode = CUBIC_IN;
-  } // end setModeCubicIn
-  void setModeCubicOut() {
-    mode = CUBIC_OUT;
-  } // end setModeCubicOut
-  void setModeQuadBoth() {
-    mode = QUAD_BOTH;
-  } // end setModeQuadBot
-  void setModeQuarticBoth() {
-    mode = QUARTIC_BOTH;
-  } // end setModeQuarticBoth
-  void setModeQuintIn() {
-    mode = QUINT_IN;
-  } // end setModeQuintIn
-  void setMode(int modeIn) {
-    mode = modeIn;
-  } // end setMode
-*/
+   mode = LINEAR;
+   } // end setModeLinear
+   void setModeCubicBoth() {
+   mode = CUBIC_BOTH;
+   } // end setModeCubic
+   void setModeCubicIn() {
+   mode = CUBIC_IN;
+   } // end setModeCubicIn
+   void setModeCubicOut() {
+   mode = CUBIC_OUT;
+   } // end setModeCubicOut
+   void setModeQuadBoth() {
+   mode = QUAD_BOTH;
+   } // end setModeQuadBot
+   void setModeQuarticBoth() {
+   mode = QUARTIC_BOTH;
+   } // end setModeQuarticBoth
+   void setModeQuintIn() {
+   mode = QUINT_IN;
+   } // end setModeQuintIn
+   void setMode(int modeIn) {
+   mode = modeIn;
+   } // end setMode
+   */
 
   public void setEaseLinear() {
     currentSplineType = EASE_LINEAR;
@@ -126,11 +126,11 @@ class STween {
   } // end setEase
 
   public float[] getEase() {
-    return currentSplineType; 
+    return currentSplineType;
   } // end getEase
 
 
-  void setTimeToFrames() {
+    void setTimeToFrames() {
     setTimeMode(FRAMES_MODE);
   } // end setTimeToFrames
   void setTimeToSeconds() {
@@ -274,7 +274,7 @@ class STween {
 
 
 
-
+// ****** //
   float value() {
     if (hasSteps()) {
       // deal with pauses...
@@ -297,17 +297,18 @@ class STween {
       } 
       else {
         float lastValue = 0;
+        // ****** // switch these two lines?
+        if (frameCount != lastFrame) {
         for (int i = 0; i < runTimes.length; i++) {
-          if (frameCount != lastFrame) {
             if (i == 0) lastValue = runTimes[i][3];
             if (timeMode == FRAMES_MODE) {
               if (i == 0 && frameCount >= runTimes[i][2]) {
                 lastValue = runTimes[i][4];
               } 
-
               // reset the start value based on the previous end value
               runTimes[i][3] = lastValue;
-              if (frameCount <= runTimes[i][2] && frameCount >= runTimes[i][1]) {       
+              if (frameCount <= runTimes[i][2] && frameCount >= runTimes[i][1]) {
+                if (i == runTimes.length - 1) runTimes[i][4] = endValue;
                 lastValue = getStep(runTimes[i], splines[i], frameCount);
               }
               else if (frameCount > runTimes[i][2]) {
@@ -322,19 +323,22 @@ class STween {
               }
             } 
             else {
-              lastTime[i] = millis();
-              if (i == 0 && millis() >= runTimes[i][2]) {
+              // ***** // 
+              long millisHolder = millis();
+              lastTime[i] = millisHolder; // millis();
+              if (i == 0 && millisHolder >= runTimes[i][2]) {
                 lastValue = runTimes[i][4];
               }
 
               // reset the start value based on the previous end value
               runTimes[i][3] = lastValue;
-              if (millis() <= runTimes[i][2] && millis() >= runTimes[i][1]) {       
-                lastValue = getStep(runTimes[i], splines[i], millis());
+              if (millisHolder <= runTimes[i][2] && millisHolder >= runTimes[i][1]) {
+                if (i == runTimes.length - 1) runTimes[i][4] = endValue;       
+                lastValue = getStep(runTimes[i], splines[i], millisHolder);
               }
-              else if (millis() > runTimes[i][2]) {
+              else if (millisHolder > runTimes[i][2]) {
                 lastValue = runTimes[i][4];
-                if (i == runTimes.length - 1 && millis() >= runTimes[runTimes.length - 1][2]) {
+                if (i == runTimes.length - 1 && millisHolder >= runTimes[runTimes.length - 1][2]) {
                   lastValue = runTimes[i][4];
                   clearArrays();
                   break;
@@ -401,14 +405,14 @@ class STween {
   } // end resetHasStarted
 
   float getStep(float[] runTimeIn, KeySpline splineIn, float timeIn) {
-    float startValue = runTimeIn[3];
-    float endValue = runTimeIn[4];
-    float diff = endValue - startValue;
+    float thisStartValue = runTimeIn[3];
+    float thisEndValue = runTimeIn[4];
+    float diff = thisEndValue - thisStartValue;
     float startTime = runTimeIn[1];
     float endTime = runTimeIn[2];
     float percentOfTime = (float)(timeIn - startTime) / (endTime - startTime);
     float splineValue = splineIn.findValue(percentOfTime);
-    return (splineValue * diff + startValue);
+    return (splineValue * diff + thisStartValue);
   } // end getStep
 } // end class STween
 

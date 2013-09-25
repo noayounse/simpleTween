@@ -4,14 +4,14 @@ import java.util.ArrayList;
 
 public class STweenManager {
 	public ArrayList<STween> allTweens = new ArrayList<STween>();
-	private ArrayList<STween> jitterTweens = new ArrayList<STween>();
+	//private ArrayList<STween> jitterTweens = new ArrayList<STween>();
 
 	private ArrayList<OnEnd> onEnds = new ArrayList<OnEnd>();
 
 	public float[] brokenValuesStart;
 	public float[] brokenValuesEnd;
 
-	private STween base;
+	public STween base;
 
 	private int degree = 1;
 
@@ -34,9 +34,9 @@ public class STweenManager {
 					brokenValuesEnd[i]));
 			// allTweens.get(i).setMode(base.mode);
 			allTweens.get(i).setEase(base.getEase());
-			jitterTweens.add(new STween(duration_ / 4, delay_, 0, 0));
-			// jitterTweens.get(i).setMode(base.mode);
-			jitterTweens.get(i).setEase(base.getEase());
+			
+			//jitterTweens.add(new STween(duration_ / 4, delay_, 0, 0));
+			//jitterTweens.get(i).setEase(base.getEase());
 		}
 	} // end setInitialTweens
 
@@ -103,6 +103,10 @@ public class STweenManager {
 		for (int i = 0; i < degree; i++)
 			allTweens.get(i).setEase(base.getEase());
 	} // end setEase
+
+	public float[] getEase() {
+		return base.getEase();
+	} // end getEase
 
 	public void setTimeToFrames() {
 		setTimeMode(SimpleTween.FRAMES_MODE);
@@ -219,8 +223,10 @@ public class STweenManager {
 				for (int i = 0; i < degree; i++)
 					allTweens.add(new STween(durationIn, delayIn,
 							currentValues[i], valuesIn[i]));
-				//for (int i = 0; i < degree; i++) allTweens.get(i).setMode(base.mode);
-				for (int i = 0; i < degree; i++) allTweens.get(i).setEase(base.getEase());
+				// for (int i = 0; i < degree; i++)
+				// allTweens.get(i).setMode(base.mode);
+				for (int i = 0; i < degree; i++)
+					allTweens.get(i).setEase(base.getEase());
 				for (int i = 0; i < degree; i++)
 					allTweens.get(i).setTimeMode(base.timeMode);
 				for (int i = 0; i < degree; i++)
@@ -238,6 +244,7 @@ public class STweenManager {
 		startOnEnds();
 	}// end playLive
 
+	/*
 	public void jitter(float[] valuesIn, float durationIn, float delayIn) {
 		for (int i = 0; i < degree; i++) {
 			jitterTweens.get(i).playLive(valuesIn[i], durationIn / 2, delayIn);
@@ -245,12 +252,13 @@ public class STweenManager {
 					durationIn / 2 + delayIn);
 		}
 	} // end jitter
+	*/
 
 	public float[] valueFloatArray() {
 		float[] broken = new float[degree];
 		for (int j = 0; j < degree; j++) {
 			broken[j] += allTweens.get(j).value();
-			broken[j] += jitterTweens.get(j).value();
+			//broken[j] += jitterTweens.get(j).value();
 		}
 
 		// look for and assign any nextTargets
@@ -271,7 +279,7 @@ public class STweenManager {
 		for (int i = 0; i < degree; i++) {
 			STween newDir = new STween(nextTarget.getDuration(),
 					nextTarget.getDelay(), allTweens.get(i).value(), nextTar[i]);
-			//newDir.setMode(base.mode);
+			// newDir.setMode(base.mode);
 			newDir.setEase(base.getEase());
 			newDir.setTimeMode(nextTarget.timeMode);
 			newDir.play();
@@ -321,7 +329,7 @@ public class STweenManager {
 	} // end clearTargets
 
 	public STween setToBaseMode(STween stIn) {
-		//stIn.setMode(base.mode);
+		// stIn.setMode(base.mode);
 		stIn.setEase(base.getEase());
 		return stIn;
 	} // end setToBaseMode
@@ -347,6 +355,12 @@ public class STweenManager {
 			}
 		}
 	} // end clearOnEnds
+
+	public int getOnEndsCount() {
+		if (onEnds != null)
+			return onEnds.size();
+		return 0;
+	} // end getOnEndsCount
 
 	public void removeFinishedOnEnds() {
 		for (int i = onEnds.size() - 1; i >= 0; i--) {

@@ -35,13 +35,17 @@ class CSTween extends STweenManager {
     super.playLive(breakUp(valueIn), durationIn, delayIn);
   } // end playLive
 
+
+  // ****** // 
+  /*
   public void jitter(color valueIn) {
-    STween lastTween = super.allTweens.get(0);
-    jitter(valueIn, lastTween.getDuration() / 4f, 0);
-  } // end jitter
-  public void jitter(color valueIn, float durationIn, float delayIn) {
-    super.jitter(breakUp(valueIn), durationIn, delayIn);
-  } // end jitter
+   STween lastTween = super.allTweens.get(0);
+   jitter(valueIn, lastTween.getDuration() / 4f, 0);
+   } // end jitter
+   public void jitter(color valueIn, float durationIn, float delayIn) {
+   super.jitter(breakUp(valueIn), durationIn, delayIn);
+   } // end jitter
+   */
 
   color value() {
     float[] broken = super.valueFloatArray();
@@ -58,15 +62,15 @@ class CSTween extends STweenManager {
   } // end breakUp
   color compose (float[] floatsIn) {
     int redone = (int)floatsIn[0];
-    redone = (int)((redone << 8) + floatsIn[1]);
-    redone = (int)((redone << 8) + floatsIn[2]);
-    redone = (int)((redone << 8) + floatsIn[3]);
+    redone = (int)((redone << 8) + constrain(floatsIn[1], 0, 255));
+    redone = (int)((redone << 8) + constrain(floatsIn[2], 0, 255));
+    redone = (int)((redone << 8) + constrain(floatsIn[3], 0, 255));
     return redone;
   } // end compose
 
 
 
-  void addNextTarget(color valueIn) {
+    void addNextTarget(color valueIn) {
     addNextTarget(super.getDuration(), super.getDelay(), valueIn, super.getTimeMode());
   } // end addNextTarget
   void addNextTarget(color valueIn, int timeModeIn) {

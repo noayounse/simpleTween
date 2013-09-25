@@ -7,6 +7,13 @@ public class FSTween extends STweenManager {
 		setInitialTweens(duration_, delay_, breakUp(startF_), breakUp(endF_));
 	} // end constructor
 
+	public FSTween get() {
+		FSTween dupe = new FSTween(super.getDuration(), super.getDelay(),
+				getBegin(), getEnd());
+		dupe.setEase(base.getEase());
+		return dupe;
+	} // end get
+
 	public void setCurrent(float valueIn) {
 		float[] brokenValues = breakUp(valueIn);
 		super.setCurrent(brokenValues);
@@ -40,14 +47,14 @@ public class FSTween extends STweenManager {
 		super.playLive(breakUp(valueIn), durationIn, delayIn);
 	} // end playLive
 
-	public void jitter(float valueIn) {
-		STween lastTween = super.allTweens.get(0);
-		jitter(valueIn, lastTween.getDuration() / 4f, 0);
-	} // end jitter
-
-	public void jitter(float valueIn, float durationIn, float delayIn) {
-		super.jitter(breakUp(valueIn), durationIn, delayIn);
-	} // end jitter
+	/*
+	 * public void jitter(float valueIn) { STween lastTween =
+	 * super.allTweens.get(0); jitter(valueIn, lastTween.getDuration() / 4f, 0);
+	 * } // end jitter
+	 * 
+	 * public void jitter(float valueIn, float durationIn, float delayIn) {
+	 * super.jitter(breakUp(valueIn), durationIn, delayIn); } // end jitter
+	 */
 
 	public float value() {
 		float[] broken = super.valueFloatArray();

@@ -47,33 +47,6 @@ public class STween {
 		originalDelay = delay_;
 	} // end constructor
 
-	/******/
-	/*
-	 * public void setModeLinear() { mode = SimpleTween.LINEAR; } // end
-	 * setModeLinear
-	 * 
-	 * public void setModeCubicBoth() { mode = SimpleTween.CUBIC_BOTH; } // end
-	 * setModeCubic
-	 * 
-	 * public void setModeCubicIn() { mode = SimpleTween.CUBIC_IN; } // end
-	 * setModeCubicIn
-	 * 
-	 * public void setModeCubicOut() { mode = SimpleTween.CUBIC_OUT; } // end
-	 * setModeCubicOut
-	 * 
-	 * public void setModeQuadBoth() { mode = SimpleTween.QUAD_BOTH; } // end
-	 * setModeQuadBot
-	 * 
-	 * public void setModeQuarticBoth() { mode = SimpleTween.QUARTIC_BOTH; } //
-	 * end setModeQuarticBoth
-	 * 
-	 * public void setModeQuintIn() { mode = SimpleTween.QUINT_IN; } // end
-	 * setModeQuintIn
-	 * 
-	 * public void setMode(int modeIn) { mode = modeIn; } // end setMode
-	 */
-	/******/
-
 	public void setEaseLinear() {
 		currentSplineType = SimpleTween.EASE_LINEAR;
 	} // end setEaseLinear
@@ -246,106 +219,125 @@ public class STween {
 	} // end calculateSteps
 
 	public float value() {
-		if (hasSteps()) {
-			// check the global pause if any
-			if (SimpleTween.globalSTpaused && !isPaused()) {
-				pause();
-			} else if (!SimpleTween.globalSTpaused && isPaused()) {
-				resume();
-			}
+		try {
+			if (hasSteps()) {
+				// check the global pause if any
+				/*
+				 * if (SimpleTween.globalSTpaused && !isPaused()) { pause(); }
+				 * else if (!SimpleTween.globalSTpaused && isPaused()) {
+				 * resume(); }
+				 */
 
-			// deal with pauses...
-			if (paused) {
-				for (int i = 0; i < runTimes.length; i++) {
-					if (SimpleTween.parent.frameCount != lastFrame) {
-						if (timeMode == SimpleTween.FRAMES_MODE) {
-							runTimes[i][1]++;
-							runTimes[i][2]++;
-							lastTime[i] = SimpleTween.parent.frameCount;
-						} else {
-							float millisDiff = SimpleTween.parent.millis()
-									- lastTime[i];
-							runTimes[i][1] += millisDiff;
-							runTimes[i][2] += millisDiff;
-							lastTime[i] = SimpleTween.parent.millis();
-						}
-
-					}
-				}
-			} else {
-				float lastValue = 0;
-				for (int i = 0; i < runTimes.length; i++) {
-					if (SimpleTween.parent.frameCount != lastFrame) {
-						if (i == 0)
-							lastValue = runTimes[i][3];
-						if (timeMode == SimpleTween.FRAMES_MODE) {
-							if (i == 0
-									&& SimpleTween.parent.frameCount >= runTimes[i][2]) {
-								lastValue = runTimes[i][4];
+				// deal with pauses...
+				if (paused) {
+					for (int i = 0; i < runTimes.length; i++) {
+						if (SimpleTween.parent.frameCount != lastFrame) {
+							if (timeMode == SimpleTween.FRAMES_MODE) {
+								runTimes[i][1]++;
+								runTimes[i][2]++;
+								lastTime[i] = SimpleTween.parent.frameCount;
+							} else {
+								float millisDiff = SimpleTween.parent.millis()
+										- lastTime[i];
+								runTimes[i][1] += millisDiff;
+								runTimes[i][2] += millisDiff;
+								lastTime[i] = SimpleTween.parent.millis();
 							}
 
-							// reset the start value based on the previous end
-							// value
-							runTimes[i][3] = lastValue;
-							if (SimpleTween.parent.frameCount <= runTimes[i][2]
-									&& SimpleTween.parent.frameCount >= runTimes[i][1]) {
-								// lastValue = getStep(runTimes[i]);
-								lastValue = getStep(runTimes[i], splines[i],
-										SimpleTween.parent.frameCount);
-							} else if (SimpleTween.parent.frameCount > runTimes[i][2]) {
-								lastValue = runTimes[i][4];
-								if (i == runTimes.length - 1
-										&& SimpleTween.parent.frameCount >= runTimes[runTimes.length - 1][2]) {
+						}
+					}
+				} else {
+					float lastValue = 0;
+					if (SimpleTween.parent.frameCount != lastFrame) {
+						for (int i = 0; i < runTimes.length; i++) {
+
+							if (i == 0)
+								lastValue = runTimes[i][3];
+							if (timeMode == SimpleTween.FRAMES_MODE) {
+								if (i == 0
+										&& SimpleTween.parent.frameCount >= runTimes[i][2]) {
 									lastValue = runTimes[i][4];
-									clearArrays();
-									break;
+								}
+
+								// reset the start value based on the previous
+								// end
+								// value
+								runTimes[i][3] = lastValue;
+								if (SimpleTween.parent.frameCount <= runTimes[i][2]
+										&& SimpleTween.parent.frameCount >= runTimes[i][1]) {
+									// lastValue = getStep(runTimes[i]);
+									// if this is the last i, then set the
+									// runTimes[i][4] to the current endValue
+									if (i == runTimes.length - 1)
+										runTimes[i][4] = endValue;
+									lastValue = getStep(runTimes[i],
+											splines[i],
+											SimpleTween.parent.frameCount);
+								} else if (SimpleTween.parent.frameCount > runTimes[i][2]) {
+									lastValue = runTimes[i][4];
+									if (i == runTimes.length - 1
+											&& SimpleTween.parent.frameCount >= runTimes[runTimes.length - 1][2]) {
+										lastValue = runTimes[i][4];
+										clearArrays();
+										break;
+									}
+								} else {
 								}
 							} else {
-							}
-						} else {
-							lastTime[i] = SimpleTween.parent.millis();
-							if (i == 0
-									&& SimpleTween.parent.millis() >= runTimes[i][2]) {
-								lastValue = runTimes[i][4];
-							}
-
-							// reset the start value based on the previous end
-							// value
-							runTimes[i][3] = lastValue;
-							if (SimpleTween.parent.millis() <= runTimes[i][2]
-									&& SimpleTween.parent.millis() >= runTimes[i][1]) {
-								// lastValue = getStep(runTimes[i]);
-								lastValue = getStep(runTimes[i], splines[i],
-										SimpleTween.parent.millis());
-							} else if (SimpleTween.parent.millis() > runTimes[i][2]) {
-								lastValue = runTimes[i][4];
-								if (i == runTimes.length - 1
-										&& SimpleTween.parent.millis() >= runTimes[runTimes.length - 1][2]) {
+								long millisHolder = SimpleTween.parent.millis();
+								lastTime[i] = millisHolder;
+								if (i == 0 && millisHolder >= runTimes[i][2]) {
 									lastValue = runTimes[i][4];
-									clearArrays();
-									break;
+								}
+
+								// reset the start value based on the previous
+								// end
+								// value
+								runTimes[i][3] = lastValue;
+								if (millisHolder <= runTimes[i][2]
+										&& millisHolder >= runTimes[i][1]) {
+									// lastValue = getStep(runTimes[i]);
+									// if this is the last i, then set the
+									// runTimes[i][4] to the current endValue
+									if (i == runTimes.length - 1)
+										runTimes[i][4] = endValue;
+									lastValue = getStep(runTimes[i],
+											splines[i], millisHolder);
+								} else if (millisHolder > runTimes[i][2]) {
+									lastValue = runTimes[i][4];
+									if (i == runTimes.length - 1
+											&& millisHolder >= runTimes[runTimes.length - 1][2]) {
+										lastValue = runTimes[i][4];
+										clearArrays();
+										break;
+									}
 								}
 							}
+							currentValue = lastValue;
 						}
-						currentValue = lastValue;
 					}
 				}
-			}
-			if (SimpleTween.parent.frameCount != lastFrame)
-				lastFrame = SimpleTween.parent.frameCount;
+				if (SimpleTween.parent.frameCount != lastFrame)
+					lastFrame = SimpleTween.parent.frameCount;
 
-		} else { // does not have steps
-			// isPlaying = false;
-			if (hasStarted) {
-				clearArrays();
+			} else { // does not have steps
+				// isPlaying = false;
+				if (hasStarted) {
+					clearArrays();
+				}
 			}
-		}
 
-		// adjust the final value when the tween is done
-		if (isDone) {
-			currentValue = endValue;
-		} else if (!hasStarted && !isPlaying) {
-			currentValue = startValue;
+			// adjust the final value when the tween is done
+			if (isDone) {
+				currentValue = endValue;
+			} else if (!hasStarted && !isPlaying) {
+				currentValue = startValue;
+			}
+
+		} // end try
+		catch (Exception e) {
+			System.out
+					.println("SimpleTween > STween > error in function float value()");
 		}
 
 		return currentValue;
@@ -358,14 +350,18 @@ public class STween {
 	} // end clearArray
 
 	public boolean hasSteps() {
-		if (timeMode == SimpleTween.FRAMES_MODE) {
-			for (float[] f : runTimes)
-				if (SimpleTween.parent.frameCount <= f[2])
-					return true;
-		} else {
-			for (float[] f : runTimes)
-				if (SimpleTween.parent.millis() <= f[2])
-					return true;
+		try {
+			if (timeMode == SimpleTween.FRAMES_MODE) {
+				for (float[] f : runTimes)
+					if (SimpleTween.parent.frameCount <= f[2])
+						return true;
+			} else {
+				for (float[] f : runTimes)
+					if (SimpleTween.parent.millis() <= f[2])
+						return true;
+			}
+		} catch (Exception e) {
+			System.out.println("SimpleTween >> error in hasSteps()");
 		}
 		return false;
 	} // end hasSteps
@@ -377,7 +373,8 @@ public class STween {
 	} // end isPlaying
 
 	public boolean isDone() {
-		if (!hasSteps() && runTimes.length > 0)
+		// if (!hasSteps() && runTimes.length > 0) // 2013_08_02 took this out
+		if (!hasSteps())
 			return true;
 		return false;
 	} // end isDone
@@ -391,14 +388,13 @@ public class STween {
 	} // end resetHasStarted
 
 	float getStep(float[] runTimeIn, KeySpline splineIn, float timeIn) {
-		float startValue = runTimeIn[3];
-		float endValue = runTimeIn[4];
-		float diff = endValue - startValue;
+		float thisStartValue = runTimeIn[3];
+		float thisEndValue = runTimeIn[4];
+		float diff = thisEndValue - thisStartValue;
 		float startTime = runTimeIn[1];
 		float endTime = runTimeIn[2];
-		float percentOfTime = (float) (timeIn - startTime)
-				/ (endTime - startTime);
+		float percentOfTime = (timeIn - startTime) / (endTime - startTime);
 		float splineValue = splineIn.findValue(percentOfTime);
-		return (splineValue * diff + startValue);
+		return (splineValue * diff + thisStartValue);
 	} // end getStep
 } // end class FST

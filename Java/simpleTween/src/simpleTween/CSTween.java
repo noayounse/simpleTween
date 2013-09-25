@@ -70,9 +70,9 @@ public class CSTween extends STweenManager {
 
 	private int compose(float[] floatsIn) {
 		int redone = (int) floatsIn[0];
-		redone = (int) ((redone << 8) + floatsIn[1]);
-		redone = (int) ((redone << 8) + floatsIn[2]);
-		redone = (int) ((redone << 8) + floatsIn[3]);
+		redone = (int) ((redone << 8) + SimpleTween.constrain(floatsIn[1], 0, 255));
+		redone = (int) ((redone << 8) + SimpleTween.constrain(floatsIn[2], 0, 255));
+		redone = (int) ((redone << 8) + SimpleTween.constrain(floatsIn[3], 0, 255));
 		return redone;
 	} // end compose
 

@@ -15,7 +15,7 @@ public class KeySpline {
     pt2 = new PVector(mX2, mY2);
   } // end constructor
 
-  KeySpline get() {
+  public KeySpline get() {
     KeySpline cp = new KeySpline(pt1.x, pt1.y, pt2.x, pt2.y);
     cp.visualWidth = visualWidth;
     cp.visualHeight = visualHeight;

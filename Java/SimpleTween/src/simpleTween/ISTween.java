@@ -8,6 +8,12 @@ public class ISTween extends STweenManager {
 				breakUp((float) endI_));
 	} // end constructor
 
+	public ISTween get() {
+		ISTween dupe = new ISTween(super.getDuration(), super.getDelay(), getBegin(), getEnd());
+		dupe.setEase(base.getEase());
+		return dupe;
+	} // end get
+	
 	public void setCurrent(int valueIn) {
 		float[] brokenValues = breakUp(valueIn);
 		super.setCurrent(brokenValues);
@@ -41,6 +47,7 @@ public class ISTween extends STweenManager {
 		super.playLive(breakUp((float) valueIn), durationIn, delayIn);
 	} // end playLive
 
+	/*
 	public void jitter(int valueIn) {
 		STween lastTween = super.allTweens.get(0);
 		jitter(valueIn, lastTween.getDuration() / 4f, 0);
@@ -49,6 +56,7 @@ public class ISTween extends STweenManager {
 	public void jitter(int valueIn, float durationIn, float delayIn) {
 		super.jitter(breakUp(valueIn), durationIn, delayIn);
 	} // end jitter
+	*/
 
 	public int value() {
 		float[] broken = super.valueFloatArray();

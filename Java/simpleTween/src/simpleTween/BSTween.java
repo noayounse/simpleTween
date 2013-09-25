@@ -9,6 +9,11 @@ public class BSTween extends STween {
 	    super.setEaseLinear();
 	  } // end constructor
 
+	  public BSTween get() {
+		  BSTween dupe = new BSTween(super.getDuration());
+		  return dupe;
+	  } // end get
+	  
 	    public void playLive(float newDuration) {
 	    super.reset();
 	    super.setDuration(newDuration);

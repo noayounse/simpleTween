@@ -36,6 +36,7 @@ class PVSTween extends STweenManager {
 
 
   // ******* //
+  /*
   public void jitter(PVector valueIn) {
     STween lastTween = super.allTweens.get(0);
     jitter(valueIn, lastTween.getDuration() / 4f, 0);
@@ -43,6 +44,7 @@ class PVSTween extends STweenManager {
   public void jitter(PVector valueIn, float durationIn, float delayIn) {
     super.jitter(breakUp(valueIn), durationIn, delayIn);
   } // end jitter
+  */
 
 
 
