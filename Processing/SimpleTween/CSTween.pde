@@ -7,6 +7,11 @@ class CSTween extends STweenManager {
     println("end of CSTween constructor");
   } // end constructor
 
+public void setCurrent(int valueIn) {
+    float[] brokenValues = breakUp(valueIn);
+    super.setCurrent(brokenValues);
+  } // end setCurrent
+
   void setBegin(color valueIn) {
     float[] brokenValues = breakUp(valueIn);
     super.setBegin(brokenValues);

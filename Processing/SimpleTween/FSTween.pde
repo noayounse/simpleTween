@@ -6,6 +6,11 @@ class FSTween extends STweenManager {
     setInitialTweens(duration_, delay_, breakUp(startF_), breakUp(endF_));
   } // end constructor
 
+  public void setCurrent(float valueIn) {
+    float[] brokenValues = breakUp(valueIn);
+    super.setCurrent(brokenValues);
+  } // end setCurrent
+
   void setBegin(float valueIn) {
     float[] brokenValues = breakUp(valueIn);
     super.setBegin(brokenValues);

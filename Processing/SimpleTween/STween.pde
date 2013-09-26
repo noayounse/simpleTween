@@ -274,98 +274,102 @@ class STween {
 
 
 
-// ****** //
+  // ****** //
   float value() {
-    if (hasSteps()) {
-      // deal with pauses...
-      if (paused) {
-        for (int i = 0; i < runTimes.length; i++) {
-          if (frameCount != lastFrame) {
-            if (timeMode == FRAMES_MODE) {
-              runTimes[i][1]++;
-              runTimes[i][2]++;
-              lastTime[i] = frameCount;
-            }
-            else {
-              float millisDiff = millis() - lastTime[i];
-              runTimes[i][1] += millisDiff;
-              runTimes[i][2] += millisDiff;
-              lastTime[i] = millis();
-            }
-          }
-        }
-      } 
-      else {
-        float lastValue = 0;
-        // ****** // switch these two lines?
-        if (frameCount != lastFrame) {
-        for (int i = 0; i < runTimes.length; i++) {
-            if (i == 0) lastValue = runTimes[i][3];
-            if (timeMode == FRAMES_MODE) {
-              if (i == 0 && frameCount >= runTimes[i][2]) {
-                lastValue = runTimes[i][4];
-              } 
-              // reset the start value based on the previous end value
-              runTimes[i][3] = lastValue;
-              if (frameCount <= runTimes[i][2] && frameCount >= runTimes[i][1]) {
-                if (i == runTimes.length - 1) runTimes[i][4] = endValue;
-                lastValue = getStep(runTimes[i], splines[i], frameCount);
-              }
-              else if (frameCount > runTimes[i][2]) {
-                lastValue = runTimes[i][4];
-                if (i == runTimes.length - 1 && frameCount >= runTimes[runTimes.length - 1][2]) {
-                  lastValue = runTimes[i][4];
-                  clearArrays();
-                  break;
-                }
+    try {
+      if (hasSteps()) {
+        // deal with pauses...
+        if (paused) {
+          for (int i = 0; i < runTimes.length; i++) {
+            if (frameCount != lastFrame) {
+              if (timeMode == FRAMES_MODE) {
+                runTimes[i][1]++;
+                runTimes[i][2]++;
+                lastTime[i] = frameCount;
               }
               else {
-              }
-            } 
-            else {
-              // ***** // 
-              long millisHolder = millis();
-              lastTime[i] = millisHolder; // millis();
-              if (i == 0 && millisHolder >= runTimes[i][2]) {
-                lastValue = runTimes[i][4];
-              }
-
-              // reset the start value based on the previous end value
-              runTimes[i][3] = lastValue;
-              if (millisHolder <= runTimes[i][2] && millisHolder >= runTimes[i][1]) {
-                if (i == runTimes.length - 1) runTimes[i][4] = endValue;       
-                lastValue = getStep(runTimes[i], splines[i], millisHolder);
-              }
-              else if (millisHolder > runTimes[i][2]) {
-                lastValue = runTimes[i][4];
-                if (i == runTimes.length - 1 && millisHolder >= runTimes[runTimes.length - 1][2]) {
-                  lastValue = runTimes[i][4];
-                  clearArrays();
-                  break;
-                }
+                float millisDiff = millis() - lastTime[i];
+                runTimes[i][1] += millisDiff;
+                runTimes[i][2] += millisDiff;
+                lastTime[i] = millis();
               }
             }
-            currentValue = lastValue;
+          }
+        } 
+        else {
+          float lastValue = 0;
+          // ****** // switch these two lines?
+          if (frameCount != lastFrame) {
+            for (int i = 0; i < runTimes.length; i++) {
+              if (i == 0) lastValue = runTimes[i][3];
+              if (timeMode == FRAMES_MODE) {
+                if (i == 0 && frameCount >= runTimes[i][2]) {
+                  lastValue = runTimes[i][4];
+                } 
+                // reset the start value based on the previous end value
+                runTimes[i][3] = lastValue;
+                if (frameCount <= runTimes[i][2] && frameCount >= runTimes[i][1]) {
+                  if (i == runTimes.length - 1) runTimes[i][4] = endValue;
+                  lastValue = getStep(runTimes[i], splines[i], frameCount);
+                }
+                else if (frameCount > runTimes[i][2]) {
+                  lastValue = runTimes[i][4];
+                  if (i == runTimes.length - 1 && frameCount >= runTimes[runTimes.length - 1][2]) {
+                    lastValue = runTimes[i][4];
+                    clearArrays();
+                    break;
+                  }
+                }
+                else {
+                }
+              } 
+              else {
+                // ***** // 
+                long millisHolder = millis();
+                lastTime[i] = millisHolder; // millis();
+                if (i == 0 && millisHolder >= runTimes[i][2]) {
+                  lastValue = runTimes[i][4];
+                }
+
+                // reset the start value based on the previous end value
+                runTimes[i][3] = lastValue;
+                if (millisHolder <= runTimes[i][2] && millisHolder >= runTimes[i][1]) {
+                  if (i == runTimes.length - 1) runTimes[i][4] = endValue;       
+                  lastValue = getStep(runTimes[i], splines[i], millisHolder);
+                }
+                else if (millisHolder > runTimes[i][2]) {
+                  lastValue = runTimes[i][4];
+                  if (i == runTimes.length - 1 && millisHolder >= runTimes[runTimes.length - 1][2]) {
+                    lastValue = runTimes[i][4];
+                    clearArrays();
+                    break;
+                  }
+                }
+              }
+              currentValue = lastValue;
+            }
           }
         }
+        if (frameCount != lastFrame) lastFrame = frameCount;
       }
-      if (frameCount != lastFrame) lastFrame = frameCount;
-    }
-    else { // does not have steps
-      //isPlaying = false;
-      if (hasStarted) {
-        clearArrays();
+      else { // does not have steps
+        //isPlaying = false;
+        if (hasStarted) {
+          clearArrays();
+        }
+      } 
+
+      // adjust the final value when the tween is done
+      if (isDone) {
+        currentValue = endValue;
+      } 
+      else if (!hasStarted && !isPlaying) {
+        currentValue = startValue;
       }
-    } 
-
-    // adjust the final value when the tween is done
-    if (isDone) {
-      currentValue = endValue;
-    } 
-    else if (!hasStarted && !isPlaying) {
-      currentValue = startValue;
     }
-
+    catch (Exception e) {
+      println("exception when getting value()");
+    }
     return currentValue;
   } // end value
 
@@ -378,11 +382,16 @@ class STween {
   } // end clearArray
 
   boolean hasSteps() {
-    if (timeMode == FRAMES_MODE) {
-      for (float[] f : runTimes) if (frameCount <= f[2]) return true;
-    } 
-    else {
-      for (float[] f : runTimes) if (millis() <= f[2]) return true;
+    try {
+      if (timeMode == FRAMES_MODE) {
+        for (float[] f : runTimes) if (frameCount <= f[2]) return true;
+      } 
+      else {
+        for (float[] f : runTimes) if (millis() <= f[2]) return true;
+      }
+    }
+    catch (Exception e) {
+      println("Exception when checking hasSteps()");
     }
     return false;
   } // end hasSteps

@@ -6,6 +6,11 @@ class PVSTween extends STweenManager {
     setInitialTweens(duration_, delay_, breakUp(startPV_), breakUp(endPV_));
   } // end constructor
 
+  public void setCurrent(processing.core.PVector valueIn) {
+    float[] brokenValues = breakUp(valueIn);
+    super.setCurrent(brokenValues);
+  } // end setCurrent
+
   void setBegin(PVector valueIn) {
     float[] brokenValues = breakUp(valueIn);
     super.setBegin(brokenValues);

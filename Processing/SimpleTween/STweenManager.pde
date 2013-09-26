@@ -67,8 +67,8 @@ class STweenManager {
   private void setEase() {
     for (int i = 0; i < degree; i++) allTweens.get(i).setEase(base.getEase());
   } // end setEase
-  
-  public float[] getEase() {
+
+    public float[] getEase() {
     return base.getEase();
   } // end getEase  
 
@@ -119,6 +119,11 @@ class STweenManager {
     for (int i = 0; i < allTweens.size(); i++) allTweens.get(i).reset();
     nextTargets = new ArrayList<NextTarget>();
   } 
+
+  public void setCurrent(float[] valuesIn) {
+    reset();
+    setBegin(valuesIn);
+  } // end setCurrent
 
   void setBegin(float[] valuesIn) {
     for (int i = 0; i < allTweens.size(); i++) allTweens.get(i).setBegin(valuesIn[i]);
@@ -185,23 +190,22 @@ class STweenManager {
       for (int i = 0; i < degree; i++) {
         allTweens.get(i).playLive(valuesIn[i], durationIn, delayIn);
       }
-
     }
     // start any onEnds
     startOnEnds();
   } // end playLive
 
 
-// ****** // 
-/*
+  // ****** // 
+  /*
   private void jitter(float[] valuesIn, float durationIn, float delayIn) {
-    for (int i = 0; i < degree; i++) {
-      jitterTweens.get(i).playLive(valuesIn[i], durationIn/2, delayIn);
-      jitterTweens.get(i).playLive(0, durationIn / 2, durationIn / 2 + delayIn);
-    }
-  } // end jitter
-*/
- 
+   for (int i = 0; i < degree; i++) {
+   jitterTweens.get(i).playLive(valuesIn[i], durationIn/2, delayIn);
+   jitterTweens.get(i).playLive(0, durationIn / 2, durationIn / 2 + delayIn);
+   }
+   } // end jitter
+   */
+
   float[] valueFloatArray() {
     float[] broken = new float[degree];
     for (int j = 0; j < degree; j++) {
