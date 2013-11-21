@@ -303,6 +303,7 @@ public class STweenManager {
 			if (!st.isDone())
 				done = false;
 		}
+		//System.out.println(SimpleTween.parent.frameCount + " checking for isDone: " + done);
 		return done;
 	} // end isDone
 
@@ -343,12 +344,14 @@ public class STweenManager {
 	} // end onEnd
 
 	public void startOnEnds() {
+		//System.out.println("in startOnEnds");
 		for (int i = 0; i < onEnds.size(); i++)
 			if (!onEnds.get(i).running && !onEnds.get(i).playedThrough)
 				onEnds.get(i).start();
 	} // end startOnEnds
 
 	public void clearOnEnds() {
+		System.out.println("in clearOnEnds");
 		for (int i = onEnds.size() - 1; i >= 0; i--) {
 			if (onEnds.get(i).running) {
 				onEnds.get(i).quit();
@@ -361,8 +364,13 @@ public class STweenManager {
 			return onEnds.size();
 		return 0;
 	} // end getOnEndsCount
+	
+	public ArrayList<OnEnd> getOnEnds() {
+		return onEnds;
+	} // end getOnEnds
 
 	public void removeFinishedOnEnds() {
+		//System.out.println("in removeFinishedOnEnds");
 		for (int i = onEnds.size() - 1; i >= 0; i--) {
 			if (onEnds.get(i).playedThrough) {
 				onEnds.remove(i);

@@ -6,6 +6,8 @@ public class OnEnd extends Thread {
 	String functionName;
 	private int lastFrame = 0;
 
+	private boolean frameTestedAlready = false; // a stupid variable required to get this thing to register for some reason
+
 	public boolean running;
 	public boolean playedThrough = false;
 
@@ -22,10 +24,25 @@ public class OnEnd extends Thread {
 		super.start();
 	} // end start
 
+	public int getLastFrame() {
+		return lastFrame;
+	} // end getLastFrame
+
 	public void run() {
 		while (running) {
+			////////////
+			if (!frameTestedAlready) {
+				@SuppressWarnings("unused")
+				long test = SimpleTween.parent.millis();
+				frameTestedAlready = true;
+			}
+			if (SimpleTween.parent.frameCount != lastFrame)
+				frameTestedAlready = false;
+			////////////
 			if (SimpleTween.parent.frameCount != lastFrame) {
+				lastFrame = SimpleTween.parent.frameCount;
 				try {
+					@SuppressWarnings("unused")
 					float iterate = referenceObj.valueFloatArray()[0];
 					if (referenceObj.isDone()
 							&& referenceObj.nextTargets.size() == 0) {
@@ -33,14 +50,15 @@ public class OnEnd extends Thread {
 						this.quit();
 					}
 				} catch (Exception e) {
-					System.out.println("error trying to run " + functionName);
+					 System.out.println("error trying to run " + functionName);
 				}
-				lastFrame = SimpleTween.parent.frameCount;
 			}
 		}
 	} // end run
 
 	void playFunction() {
+		// System.out.println("in playFunction trying to play: " +
+		// functionName);
 		// see
 		// http://stackoverflow.com/questions/160970/how-do-i-invoke-a-java-method-when-given-the-method-name-as-a-string
 		java.lang.reflect.Method method;
@@ -66,7 +84,7 @@ public class OnEnd extends Thread {
 	} // end playFunction
 
 	void quit() {
-		// println("quitting thread");
+		// System.out.println("quitting thread");
 		running = false;
 		interrupt();
 		playedThrough = true;

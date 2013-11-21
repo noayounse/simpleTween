@@ -1,5 +1,7 @@
 package simpleTween;
 
+import java.util.ArrayList;
+
 public class MSTween {
 	private STweenManager st;
 	private String methodName;
@@ -27,6 +29,16 @@ public class MSTween {
 		return st.getTimeMode();
 	} // end getTimeMode
 
+	public String getOnEndStatus() {
+		ArrayList<OnEnd> onEnds = st.getOnEnds();
+		String builder = "MST size of ends: " + onEnds.size() + "\n";
+		for (int i = 0; i < onEnds.size(); i++) {
+			OnEnd oe = onEnds.get(i);
+			builder += " ## " + i + " running: " + oe.running + " playedThrough: " + oe.playedThrough + " lastFrame: " + oe.getLastFrame();
+		}
+		return builder;
+	} // end getOnEndStatus 
+	
 	public boolean isPlaying() {
 		if (st.isPlaying())
 			return true;
